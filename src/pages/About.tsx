@@ -129,11 +129,11 @@ export default function AboutPage() {
                 </motion.div>
 
                 {/* Problem-based Heading - establishes relatable hook */}
-                <h1 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
+                <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-8 leading-snug max-w-4xl mx-auto">
                   <span className="text-slate-900">Bắt Đầu Từ Sự Thất Vọng</span>
                   <br />
                   <span className="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                    Với Những Công Cụ Quá Phức Tạp
+                    Với Công Cụ Quá Phức Tạp
                   </span>
                 </h1>
 

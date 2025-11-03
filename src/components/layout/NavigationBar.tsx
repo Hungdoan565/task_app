@@ -40,8 +40,8 @@ export default function NavigationBar() {
       onClick={onClick}
       className={`transition-all duration-300 font-medium ${
         isActive(to)
-          ? "text-blue-600 font-bold"
-          : "text-gray-700 hover:text-blue-600"
+          ? "text-indigo-600 font-bold"
+          : "text-gray-700 hover:text-indigo-600"
       }`}
     >
       {label}
@@ -57,9 +57,9 @@ export default function NavigationBar() {
             whileHover={{ rotate: 360, scale: 1.1 }}
             transition={{ duration: 0.6 }}
           >
-            <CheckCircle className="h-8 w-8 text-cyan-500" />
+            <CheckCircle className="h-8 w-8 text-indigo-600" />
           </motion.div>
-          <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+          <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
             TaskFlow
           </span>
         </Link>
@@ -72,27 +72,35 @@ export default function NavigationBar() {
         </div>
 
         {/* Auth Buttons */}
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden md:flex items-center space-x-3">
           {user ? (
             <Link to="/dashboard">
-              <Button className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-md hover:shadow-lg transition-all duration-300">
-                Bảng Điều Khiển
-              </Button>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button className="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 hover:from-indigo-700 hover:via-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300 font-semibold">
+                  Bảng Điều Khiển
+                </Button>
+              </motion.div>
             </Link>
           ) : (
             <>
-              <Link to="/login">
-                <Button
-                  variant="ghost"
-                  className="hover:bg-blue-50 hover:text-blue-600"
-                >
-                  Đăng Nhập
-                </Button>
+              <Link to="/signin">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    variant="outline"
+                    className="relative border-2 border-slate-300 hover:border-indigo-300 bg-white hover:bg-gradient-to-r hover:from-indigo-50 hover:to-blue-50 font-semibold transition-all duration-300 shadow-sm hover:shadow-md"
+                  >
+                    <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent hover:from-indigo-700 hover:to-blue-700">
+                      Đăng Nhập
+                    </span>
+                  </Button>
+                </motion.div>
               </Link>
               <Link to="/signup">
-                <Button className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 shadow-md hover:shadow-lg transition-all duration-300">
-                  Bắt Đầu
-                </Button>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button className="bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 hover:from-indigo-700 hover:via-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 font-semibold">
+                    Đăng Ký
+                  </Button>
+                </motion.div>
               </Link>
             </>
           )}
@@ -104,7 +112,7 @@ export default function NavigationBar() {
             <Button
               variant="ghost"
               size="icon"
-              className="hover:bg-blue-50 hover:text-blue-600"
+              className="hover:bg-indigo-50 hover:text-indigo-600"
             >
               <Menu className="h-6 w-6" />
               <span className="sr-only">Mở menu</span>
@@ -112,8 +120,8 @@ export default function NavigationBar() {
           </SheetTrigger>
           <SheetContent side="right" className="w-[300px]">
             <div className="flex items-center space-x-2 mb-8">
-              <CheckCircle className="h-8 w-8 text-cyan-500" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+              <CheckCircle className="h-8 w-8 text-indigo-600" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 TaskFlow
               </span>
             </div>
@@ -132,23 +140,25 @@ export default function NavigationBar() {
 
               {user ? (
                 <Link to="/dashboard" onClick={() => setOpen(false)}>
-                  <Button className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700">
+                  <Button className="w-full bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 hover:from-indigo-700 hover:via-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl font-semibold">
                     Bảng Điều Khiển
                   </Button>
                 </Link>
               ) : (
                 <div className="flex flex-col space-y-3">
-                  <Link to="/login" onClick={() => setOpen(false)}>
+                  <Link to="/signin" onClick={() => setOpen(false)}>
                     <Button
                       variant="outline"
-                      className="w-full border-2 hover:bg-blue-50 hover:border-blue-300"
+                      className="w-full border-2 border-slate-300 hover:border-indigo-300 bg-white hover:bg-gradient-to-r hover:from-indigo-50 hover:to-blue-50 font-semibold shadow-sm hover:shadow-md"
                     >
-                      Đăng Nhập
+                      <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
+                        Đăng Nhập
+                      </span>
                     </Button>
                   </Link>
                   <Link to="/signup" onClick={() => setOpen(false)}>
-                    <Button className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700">
-                      Bắt Đầu
+                    <Button className="w-full bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 hover:from-indigo-700 hover:via-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl font-semibold">
+                      Đăng Ký
                     </Button>
                   </Link>
                 </div>
