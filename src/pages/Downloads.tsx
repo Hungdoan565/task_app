@@ -164,7 +164,7 @@ export default function DownloadsPage() {
                 initial={{ opacity: 0, y: -12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
-                className="inline-flex items-center gap-2 rounded-full border border-indigo-200/60 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-indigo-600 shadow-sm backdrop-blur"
+                className="inline-flex items-center gap-2 rounded-full border border-indigo-200/60 bg-white/70 px-4 py-2 text-xs mt-5 font-semibold uppercase tracking-[0.25em] text-indigo-600 shadow-sm backdrop-blur"
               >
                 <Chrome className="h-4 w-4" />
                 Everywhere Access
@@ -196,13 +196,13 @@ export default function DownloadsPage() {
                 transition={{ duration: 0.4, delay: 0.3 }}
                 className="mt-8 flex flex-wrap items-center justify-center gap-3"
               >
-                <Button className="cta-base cta-animated cta-primary px-6 py-3 text-base">
+                <Button className="cta-base cta-animated cta-primary px-6 py-2.5 text-base">
                   Tải cho Desktop
                   <ArrowRight className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="outline"
-                  className="cta-base cta-animated cta-outline-indigo px-6 py-3 text-base"
+                  className="rounded-full border-2 border-indigo-300 bg-white px-6 py-2.5 text-base font-semibold text-indigo-600 shadow-md hover:bg-indigo-50 hover:border-indigo-400 hover:shadow-lg transition-all duration-300"
                 >
                   Mở trên Web
                 </Button>
@@ -244,7 +244,7 @@ export default function DownloadsPage() {
                         Release notes
                       </button>
                     </div>
-                    <Button className="cta-base w-full justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-lg hover:bg-slate-800">
+                    <Button className="mt-6 w-full justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-lg hover:bg-slate-800 transition-all duration-200">
                       {platform.action}
                       <ArrowRight className="h-4 w-4" />
                     </Button>
@@ -320,11 +320,11 @@ export default function DownloadsPage() {
                       <p className="text-sm font-semibold text-slate-900">
                         Gửi link tới email
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-600">
                         Nhận link tải ứng dụng trong hộp thư của bạn.
                       </p>
                     </div>
-                    <Button className="cta-base cta-outline-indigo rounded-full px-4 py-2 text-xs font-semibold">
+                    <Button className="rounded-xl border-2 border-indigo-200 bg-white px-4 py-2 text-xs font-bold text-indigo-600 shadow-sm hover:bg-indigo-50 hover:border-indigo-300 hover:shadow-md transition-all duration-200">
                       Gửi Link
                     </Button>
                   </Card>
@@ -411,7 +411,7 @@ export default function DownloadsPage() {
                       <p className="mt-2 text-xs text-slate-500 leading-relaxed">
                         {extension.description}
                       </p>
-                      <Button className="cta-base w-full justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
+                      <Button className="mt-4 w-full justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-md hover:shadow-lg hover:bg-slate-800 transition-all duration-200">
                         Cài đặt
                         <ArrowRight className="h-4 w-4" />
                       </Button>
