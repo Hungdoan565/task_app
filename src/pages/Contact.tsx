@@ -1,8 +1,25 @@
-import { useState, FormEvent } from "react";
+import { FormEvent, useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  ArrowUpRight,
+  CheckCircle,
+  Clock,
+  LifeBuoy,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+  Send,
+  Sparkles,
+} from "lucide-react";
+
+import NavigationBar from "@/components/layout/NavigationBar";
+import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -10,22 +27,105 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card } from "@/components/ui/card";
-import {
-  CheckCircle,
-  Mail,
-  Clock,
-  MapPin,
-  Send,
-  MessageCircle,
-  HelpCircle,
-} from "lucide-react";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import NavigationBar from "@/components/layout/NavigationBar";
-import SEO from "@/components/SEO";
-import { supabase } from "@/lib/supabase";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
+
+const heroHighlights = [
+  {
+    value: "98%",
+    label: "Khách hàng hài lòng với đội ngũ hỗ trợ TaskFlow",
+  },
+  {
+    value: "<12h",
+    label: "Thời gian phản hồi trung bình cho các yêu cầu ưu tiên",
+  },
+  {
+    value: "500+",
+    label: "Nhóm đang vận hành công việc mỗi ngày với TaskFlow",
+  },
+];
+
+const contactInfo = [
+  {
+    icon: Mail,
+    title: "Email",
+    details: ["hello@taskflow.vn", "support@taskflow.vn"],
+    gradient: "from-indigo-500 via-blue-500 to-sky-500",
+  },
+  {
+    icon: Clock,
+    title: "Thời Gian Phản Hồi",
+    details: ["Thứ 2 - Thứ 6: 08:00 - 22:00", "Thứ 7: 09:00 - 17:00"],
+    gradient: "from-sky-500 via-cyan-500 to-teal-500",
+  },
+  {
+    icon: MapPin,
+    title: "Văn Phòng",
+    details: ["Hà Nội", "TP. Hồ Chí Minh"],
+    gradient: "from-purple-500 via-indigo-500 to-blue-500",
+  },
+];
+
+const supportChannels = [
+  {
+    icon: Phone,
+    title: "Đường dây ưu tiên",
+    description:
+      "Đặt lịch gọi 1-1 với chuyên gia CSKH cho những yêu cầu chiến lược hoặc khẩn cấp.",
+  },
+  {
+    icon: LifeBuoy,
+    title: "Trung tâm hỗ trợ",
+    description:
+      "Kho hướng dẫn, video và checklist giúp bạn tự xử lý hầu hết vấn đề chỉ trong vài phút.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Cộng đồng TaskFlow",
+    description:
+      "Trao đổi với các nhóm khác, chia sẻ kinh nghiệm triển khai quy trình hiệu quả.",
+    badge: "Sắp ra mắt",
+  },
+];
+
+type QuickLink =
+  | { label: string; to: string }
+  | { label: string; href: string };
+
+const quickLinks: QuickLink[] = [
+  { label: "Xem Tính Năng", to: "/features" },
+  { label: "Về Chúng Tôi", to: "/about" },
+  { label: "Báo Cáo Sự Cố", href: "mailto:support@taskflow.vn" },
+];
+
+const faqs = [
+  {
+    question: "TaskFlow có thực sự miễn phí không?",
+    answer:
+      "Có. Gói Starter miễn phí trọn đời với số lượng task không giới hạn và các tính năng nền tảng cho nhóm nhỏ.",
+  },
+  {
+    question: "Tôi có thể sử dụng TaskFlow khi không có internet?",
+    answer:
+      "Hiện tại ứng dụng cần kết nối internet để đồng bộ dữ liệu theo thời gian thực. Chế độ offline đang trong quá trình thử nghiệm nội bộ.",
+  },
+  {
+    question: "Dữ liệu của tôi có được bảo mật?",
+    answer:
+      "Mọi dữ liệu đều được mã hóa, sao lưu định kỳ và lưu trữ trên hạ tầng đạt chuẩn bảo mật quốc tế. Chúng tôi tuân thủ nghiêm ngặt các chính sách bảo vệ quyền riêng tư.",
+  },
+  {
+    question: "Tôi có thể xuất dữ liệu không?",
+    answer:
+      "Bạn có thể xuất dữ liệu bất kỳ lúc nào dưới định dạng CSV hoặc JSON, phù hợp với các công cụ BI và lưu trữ nội bộ.",
+  },
+  {
+    question: "TaskFlow hỗ trợ khách hàng như thế nào?",
+    answer:
+      "Mọi người dùng đều nhận được hỗ trợ qua email. Người dùng gói Pro và Enterprise có thêm kênh chat ưu tiên và cố vấn triển khai định kỳ.",
+  },
+];
 
 export default function ContactPage() {
   const { toast } = useToast();
@@ -37,8 +137,8 @@ export default function ContactPage() {
     message: "",
   });
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
     setLoading(true);
 
     try {
@@ -54,11 +154,10 @@ export default function ContactPage() {
       if (error) throw error;
 
       toast({
-        title: "Tin Nhắn Đã Được Gửi! 🎉",
-        description: "Chúng tôi sẽ phản hồi trong vòng 24 giờ.",
+        title: "Tin nhắn đã được gửi! 🎉",
+        description: "Chúng tôi sẽ phản hồi trong vòng 24 giờ làm việc.",
       });
 
-      // Reset form
       setFormData({
         name: "",
         email: "",
@@ -67,8 +166,8 @@ export default function ContactPage() {
       });
     } catch (error) {
       toast({
-        title: "Lỗi",
-        description: "Không thể gửi tin nhắn. Vui lòng thử lại.",
+        title: "Đã có lỗi xảy ra",
+        description: "Không thể gửi tin nhắn. Vui lòng thử lại sau ít phút.",
         variant: "destructive",
       });
       console.error("Error sending message:", error);
@@ -77,214 +176,275 @@ export default function ContactPage() {
     }
   };
 
-  const faqs = [
-    {
-      question: "TaskFlow có thực sự miễn phí không?",
-      answer:
-        "Có! Miễn phí mãi mãi với số lượng task không giới hạn và các tính năng cơ bản.",
-    },
-    {
-      question: "Tôi có thể sử dụng offline không?",
-      answer:
-        "Hiện tại cần kết nối internet. Chế độ offline đang được phát triển.",
-    },
-    {
-      question: "Dữ liệu của tôi có an toàn không?",
-      answer: "Mã hóa cấp ngân hàng, sao lưu định kỳ, và tuân thủ GDPR đầy đủ.",
-    },
-    {
-      question: "Tôi có thể xuất dữ liệu không?",
-      answer:
-        "Có, bạn có thể xuất dữ liệu sang định dạng JSON/CSV bất kỳ lúc nào.",
-    },
-    {
-      question: "Có hỗ trợ khách hàng không?",
-      answer:
-        "Hỗ trợ qua email cho tất cả người dùng, với hỗ trợ ưu tiên cho người dùng Pro.",
-    },
-  ];
-
-  const contactInfo = [
-    {
-      icon: Mail,
-      title: "Email",
-      details: ["hello@taskflow.vn", "support@taskflow.vn"],
-      gradient: "from-blue-500 to-cyan-500",
-    },
-    {
-      icon: Clock,
-      title: "Thời Gian Phản Hồi",
-      details: ["Chúng tôi thường phản hồi trong vòng 24 giờ làm việc"],
-      gradient: "from-purple-500 to-pink-500",
-    },
-    {
-      icon: MapPin,
-      title: "Địa Chỉ",
-      details: ["Việt Nam", "Hà Nội & TP. Hồ Chí Minh"],
-      gradient: "from-green-500 to-emerald-500",
-    },
-  ];
-
   return (
     <>
       <SEO
         title="Liên Hệ"
-        description="Liên hệ với đội ngũ TaskFlow. Chúng tôi ở đây để giúp đỡ với bất kỳ câu hỏi, phản hồi, hoặc hỗ trợ nào bạn cần."
+        description="Liên hệ với đội ngũ TaskFlow để nhận được phản hồi nhanh chóng và chuyên nghiệp."
         path="/contact"
       />
 
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-background text-foreground">
         <NavigationBar />
 
-        {/* Hero Section */}
-        <section className="relative pt-32 pb-16 px-4 overflow-hidden">
-          {/* Animated Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+        <main className="relative">
+          <section className="relative overflow-hidden pt-32 pb-section-md">
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-100 via-white to-sky-100" />
             <motion.div
-              className="absolute top-20 right-20 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl"
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.5, 0.3],
-              }}
-              transition={{
-                duration: 8,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
+              className="absolute -left-24 top-12 h-72 w-72 rounded-full bg-indigo-500/10 blur-3xl"
+              animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.6, 0.4] }}
+              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
             />
             <motion.div
-              className="absolute bottom-20 left-20 w-80 h-80 bg-purple-400/20 rounded-full blur-3xl"
-              animate={{
-                scale: [1.2, 1, 1.2],
-                opacity: [0.2, 0.4, 0.2],
-              }}
-              transition={{
-                duration: 10,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
+              className="absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-sky-400/10 blur-3xl"
+              animate={{ scale: [1.2, 0.9, 1.2], opacity: [0.3, 0.5, 0.3] }}
+              transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
             />
-          </div>
 
-          <div className="container mx-auto text-center max-w-3xl relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-                <span className="text-gray-900">Liên Hệ</span>{" "}
-                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                  Với Chúng Tôi
-                </span>
-              </h1>
-              <p className="text-xl md:text-2xl text-gray-600 leading-relaxed">
-                Có câu hỏi? Chúng tôi rất vui được lắng nghe từ bạn. Gửi tin
-                nhắn và chúng tôi sẽ phản hồi sớm nhất có thể.
-              </p>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Contact Info Cards */}
-        <section className="py-16 px-4 bg-white">
-          <div className="container mx-auto max-w-6xl">
-            <div className="grid md:grid-cols-3 gap-6 mb-16">
-              {contactInfo.map((info, idx) => (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                  whileHover={{ y: -8 }}
-                >
-                  <Card className="p-6 h-full hover:shadow-xl transition-all duration-300 border-2 border-gray-100 hover:border-blue-200">
-                    <div
-                      className={`bg-gradient-to-r ${info.gradient} p-4 rounded-2xl w-fit mb-4`}
-                    >
-                      <info.icon className="h-6 w-6 text-white" />
-                    </div>
-                    <h3 className="font-bold text-xl text-gray-900 mb-3">
-                      {info.title}
-                    </h3>
-                    {info.details.map((detail, i) => (
-                      <p key={i} className="text-gray-600 text-sm mb-1">
-                        {detail}
-                      </p>
-                    ))}
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Contact Form Section */}
-        <section className="py-16 px-4 bg-gradient-to-br from-gray-50 to-blue-50">
-          <div className="container mx-auto max-w-6xl">
-            <div className="grid md:grid-cols-3 gap-12">
-              {/* Contact Form - 2 columns */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6 }}
-                className="md:col-span-2"
+            <div className="relative mx-auto max-w-container-lg px-4 text-center">
+              <motion.span
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-indigo-200/70 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600 shadow-sm backdrop-blur"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
               >
-                <Card className="p-8 bg-white shadow-xl border-2 border-gray-100">
-                  <div className="flex items-center mb-6">
-                    <div className="bg-gradient-to-r from-blue-600 to-cyan-600 p-3 rounded-xl mr-4">
-                      <MessageCircle className="h-6 w-6 text-white" />
+                <Sparkles className="h-4 w-4" />
+                Trung tâm hỗ trợ TaskFlow
+              </motion.span>
+
+              <motion.h1
+                className="mt-6 text-display-sm md:text-display-lg font-semibold text-gray-900"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+              >
+                Liên Hệ <span className="gradient-text">TaskFlow</span>
+              </motion.h1>
+
+              <motion.p
+                className="mx-auto mt-4 max-w-2xl text-body-lg text-muted-foreground"
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                Chúng tôi luôn sẵn sàng đồng hành. Hãy cho chúng tôi biết điều
+                bạn đang cần và đội ngũ chuyên gia sẽ phản hồi một cách tận tâm
+                nhất.
+              </motion.p>
+
+              <motion.div
+                className="mt-12 grid gap-4 sm:grid-cols-3"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: { opacity: 0, y: 12 },
+                  visible: {
+                    opacity: 1,
+                    y: 0,
+                    transition: { staggerChildren: 0.12 },
+                  },
+                }}
+              >
+                {heroHighlights.map((item) => (
+                  <motion.div
+                    key={item.label}
+                    variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
+                  >
+                    <div className="rounded-3xl border border-white/60 bg-white/80 p-6 shadow-sm backdrop-blur transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
+                      <p className="text-3xl font-semibold text-gray-900">
+                        {item.value}
+                      </p>
+                      <p className="mt-2 text-sm text-muted-foreground">
+                        {item.label}
+                      </p>
                     </div>
-                    <h2 className="text-3xl font-bold text-gray-900">
-                      Gửi Tin Nhắn
-                    </h2>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          </section>
+
+          <section className="px-4 py-section-md">
+            <div className="mx-auto grid max-w-container-lg gap-12 lg:grid-cols-[1.9fr,1.1fr]">
+              <div className="space-y-10">
+                <div>
+                  <span className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500">
+                    Kênh liên hệ chính thức
+                  </span>
+                  <h2 className="mt-4 text-heading-lg md:text-display-sm font-semibold text-gray-900">
+                    Chọn kênh phù hợp với nhu cầu của bạn
+                  </h2>
+                  <p className="mt-3 max-w-2xl text-sm md:text-base text-muted-foreground">
+                    Từ email hỗ trợ đến các buổi tư vấn trực tiếp, chúng tôi luôn
+                    duy trì sự nhất quán về chất lượng và tốc độ phản hồi.
+                  </p>
+                </div>
+
+                <div className="grid gap-6 sm:grid-cols-2">
+                  {contactInfo.map((info, index) => (
+                    <motion.div
+                      key={info.title}
+                      initial={{ opacity: 0, y: 14 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: index * 0.08 }}
+                    >
+                      <Card className="relative h-full overflow-hidden rounded-3xl border border-border/60 bg-white/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl backdrop-blur">
+                        <div
+                          className={`inline-flex items-center justify-center rounded-2xl bg-gradient-to-r ${info.gradient} p-4 text-white shadow-lg`}
+                        >
+                          <info.icon className="h-6 w-6" />
+                        </div>
+                        <h3 className="mt-5 text-lg font-semibold text-gray-900">
+                          {info.title}
+                        </h3>
+                        <div className="mt-3 space-y-1 text-sm text-muted-foreground">
+                          {info.details.map((detail) => (
+                            <p key={detail}>{detail}</p>
+                          ))}
+                        </div>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+
+              <motion.div
+                className="rounded-3xl border border-indigo-200/60 bg-indigo-50/60 p-8 shadow-inner backdrop-blur"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.12 }}
+              >
+                <div>
+                  <h3 className="text-heading-sm font-semibold text-indigo-900">
+                    Đội ngũ hỗ trợ chuyên sâu
+                  </h3>
+                  <p className="mt-2 text-sm text-indigo-700">
+                    Mỗi kênh đều có SLA rõ ràng và được vận hành bởi những
+                    chuyên gia giàu kinh nghiệm triển khai TaskFlow cho doanh
+                    nghiệp.
+                  </p>
+                </div>
+
+                <div className="mt-6 space-y-5">
+                  {supportChannels.map((channel) => (
+                    <div
+                      key={channel.title}
+                      className="group relative overflow-hidden rounded-2xl border border-white/60 bg-white/80 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-lg backdrop-blur"
+                    >
+                      <div className="flex items-start gap-4">
+                        <span className="rounded-xl bg-indigo-100 p-3 text-indigo-600">
+                          <channel.icon className="h-5 w-5" />
+                        </span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-base font-semibold text-gray-900">
+                              {channel.title}
+                            </h4>
+                            {channel.badge && (
+                              <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[11px] font-semibold uppercase text-indigo-600">
+                                {channel.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {channel.description}
+                          </p>
+                        </div>
+                        <ArrowUpRight className="mt-1 hidden h-4 w-4 text-indigo-400 group-hover:block" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </div>
+          </section>
+
+          <section className="bg-gradient-to-b from-white via-indigo-50/40 to-white px-4 py-section-md">
+            <div className="mx-auto grid max-w-container-lg gap-10 lg:grid-cols-[1.6fr,1fr]">
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+                className="relative overflow-hidden rounded-3xl border border-border/50 bg-white/90 p-10 shadow-xl backdrop-blur"
+              >
+                <motion.div
+                  className="absolute -top-20 -right-16 h-52 w-52 rounded-full bg-indigo-500/10 blur-3xl"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+                />
+
+                <div className="relative">
+                  <div className="flex items-center gap-3">
+                    <span className="rounded-2xl bg-indigo-100 p-3 text-indigo-600">
+                      <MessageCircle className="h-6 w-6" />
+                    </span>
+                    <div>
+                      <h2 className="text-heading-lg font-semibold text-gray-900">
+                        Gửi Tin Nhắn
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        Vui lòng mô tả càng chi tiết càng tốt để chúng tôi hỗ trợ
+                        hiệu quả hơn.
+                      </p>
+                    </div>
                   </div>
 
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                      <Label htmlFor="name" className="text-base font-semibold">
-                        Họ và Tên *
-                      </Label>
-                      <Input
-                        id="name"
-                        type="text"
-                        placeholder="Nguyễn Văn A"
-                        required
-                        value={formData.name}
-                        onChange={(e) =>
-                          setFormData({ ...formData, name: e.target.value })
-                        }
-                        className="mt-2 h-12"
-                      />
-                    </div>
+                  <form
+                    onSubmit={handleSubmit}
+                    className="mt-8 grid gap-6"
+                    noValidate
+                  >
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <div>
+                        <Label
+                          htmlFor="name"
+                          className="text-sm font-semibold text-gray-900"
+                        >
+                          Họ và tên *
+                        </Label>
+                        <Input
+                          id="name"
+                          type="text"
+                          placeholder="Nguyễn Văn A"
+                          required
+                          value={formData.name}
+                          onChange={(event) =>
+                            setFormData({ ...formData, name: event.target.value })
+                          }
+                          className="mt-2 h-12 rounded-xl border-border/60 text-base"
+                        />
+                      </div>
 
-                    <div>
-                      <Label
-                        htmlFor="email"
-                        className="text-base font-semibold"
-                      >
-                        Email *
-                      </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="email@example.com"
-                        required
-                        value={formData.email}
-                        onChange={(e) =>
-                          setFormData({ ...formData, email: e.target.value })
-                        }
-                        className="mt-2 h-12"
-                      />
+                      <div>
+                        <Label
+                          htmlFor="email"
+                          className="text-sm font-semibold text-gray-900"
+                        >
+                          Email *
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="email@example.com"
+                          required
+                          value={formData.email}
+                          onChange={(event) =>
+                            setFormData({ ...formData, email: event.target.value })
+                          }
+                          className="mt-2 h-12 rounded-xl border-border/60 text-base"
+                        />
+                      </div>
                     </div>
 
                     <div>
                       <Label
                         htmlFor="subject"
-                        className="text-base font-semibold"
+                        className="text-sm font-semibold text-gray-900"
                       >
-                        Chủ Đề *
+                        Chủ đề *
                       </Label>
                       <Select
                         value={formData.subject}
@@ -292,8 +452,8 @@ export default function ContactPage() {
                           setFormData({ ...formData, subject: value })
                         }
                       >
-                        <SelectTrigger className="mt-2 h-12">
-                          <SelectValue />
+                        <SelectTrigger className="mt-2 h-12 rounded-xl border-border/60 text-base">
+                          <SelectValue placeholder="Chủ đề bạn quan tâm" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Câu Hỏi Chung">
@@ -315,9 +475,9 @@ export default function ContactPage() {
                     <div>
                       <Label
                         htmlFor="message"
-                        className="text-base font-semibold"
+                        className="text-sm font-semibold text-gray-900"
                       >
-                        Tin Nhắn *
+                        Tin nhắn *
                       </Label>
                       <Textarea
                         id="message"
@@ -325,230 +485,252 @@ export default function ContactPage() {
                         placeholder="Cho chúng tôi biết chúng tôi có thể giúp gì cho bạn..."
                         required
                         value={formData.message}
-                        onChange={(e) =>
-                          setFormData({ ...formData, message: e.target.value })
+                        onChange={(event) =>
+                          setFormData({
+                            ...formData,
+                            message: event.target.value,
+                          })
                         }
-                        className="mt-2"
+                        className="mt-2 rounded-xl border-border/60 text-base"
                       />
                     </div>
 
-                    <motion.div
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                       <Button
                         type="submit"
                         size="lg"
-                        className="w-full h-12 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-600 px-6 py-3 text-base font-semibold text-white shadow-lg transition-all duration-300 hover:from-indigo-700 hover:via-blue-700 hover:to-sky-700 hover:shadow-xl"
                         disabled={loading}
                       >
                         {loading ? (
-                          <div className="flex items-center">
-                            <motion.div
+                          <>
+                            <motion.span
+                              className="h-5 w-5"
                               animate={{ rotate: 360 }}
                               transition={{
                                 duration: 1,
                                 repeat: Infinity,
                                 ease: "linear",
                               }}
-                              className="mr-2"
                             >
-                              <div className="h-5 w-5 border-2 border-white border-t-transparent rounded-full" />
-                            </motion.div>
-                            Đang Gửi...
-                          </div>
+                              <span className="block h-full w-full rounded-full border-2 border-white border-t-transparent" />
+                            </motion.span>
+                            Đang gửi...
+                          </>
                         ) : (
                           <>
-                            Gửi Tin Nhắn
-                            <Send className="ml-2 h-5 w-5" />
+                            Gửi tin nhắn
+                            <Send className="h-5 w-5" />
                           </>
                         )}
                       </Button>
                     </motion.div>
                   </form>
-                </Card>
+                </div>
               </motion.div>
 
-              {/* Quick Links - 1 column */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
+              <motion.aside
                 className="space-y-6"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: 0.1 }}
               >
-                <Card className="p-6 bg-white shadow-lg border-2 border-gray-100 hover:shadow-xl transition-shadow duration-300">
-                  <div className="bg-gradient-to-r from-orange-500 to-red-500 p-3 rounded-xl w-fit mb-4">
-                    <HelpCircle className="h-6 w-6 text-white" />
-                  </div>
-                  <h3 className="font-bold text-xl text-gray-900 mb-3">
-                    Cần Hỗ Trợ Nhanh?
+                <Card className="rounded-3xl border border-border/60 bg-white/80 p-8 shadow-lg backdrop-blur">
+                  <h3 className="text-heading-sm font-semibold text-gray-900">
+                    Làm việc cùng chúng tôi
                   </h3>
-                  <p className="text-gray-600 mb-4 text-sm leading-relaxed">
-                    Xem các câu hỏi thường gặp bên dưới hoặc truy cập trang tính
-                    năng để tìm hiểu thêm về TaskFlow.
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Đảm bảo thông tin quan trọng được ưu tiên xử lý trong phiên
+                    đầu tiên.
                   </p>
-                  <div className="space-y-3">
-                    <Link to="/features">
+                  <ul className="mt-6 space-y-4 text-sm text-muted-foreground">
+                    <li className="flex gap-3">
+                      <span className="mt-1 h-2.5 w-2.5 rounded-full bg-indigo-500" />
+                      Chúng tôi phản hồi mọi yêu cầu trong vòng 1 ngày làm việc.
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="mt-1 h-2.5 w-2.5 rounded-full bg-indigo-500" />
+                      Người dùng gói Pro được ưu tiên hỗ trợ trong giờ hành chính.
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="mt-1 h-2.5 w-2.5 rounded-full bg-indigo-500" />
+                      Với yêu cầu triển khai quy mô lớn, chúng tôi có đội dự án
+                      riêng.
+                    </li>
+                  </ul>
+
+                  <div className="mt-6 space-y-3">
+                    {quickLinks.map((link) => (
                       <Button
+                        key={link.label}
                         variant="outline"
-                        className="w-full justify-start border-2 hover:bg-blue-50 hover:border-blue-300"
+                        className="group w-full justify-between rounded-xl border border-border/60 bg-white/70 px-4 py-3 text-sm font-semibold text-foreground hover:border-indigo-200 hover:bg-indigo-50"
+                        asChild
                       >
-                        → Xem Tính Năng
+                        {"to" in link ? (
+                          <Link to={link.to}>
+                            <span>{link.label}</span>
+                            <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                          </Link>
+                        ) : (
+                          <a href={link.href} rel="noopener noreferrer">
+                            <span>{link.label}</span>
+                            <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1" />
+                          </a>
+                        )}
                       </Button>
-                    </Link>
-                    <Link to="/about">
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start border-2 hover:bg-blue-50 hover:border-blue-300"
-                      >
-                        → Về Chúng Tôi
-                      </Button>
-                    </Link>
-                    <Link to="/">
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start border-2 hover:bg-blue-50 hover:border-blue-300"
-                      >
-                        → Trang Chủ
-                      </Button>
-                    </Link>
+                    ))}
                   </div>
                 </Card>
 
-                <Card className="p-6 bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-100">
-                  <h3 className="font-bold text-lg text-gray-900 mb-3">
-                    💡 Mẹo Hữu Ích
+                <div className="rounded-3xl bg-gradient-to-br from-indigo-600 via-blue-600 to-sky-500 p-8 text-white shadow-xl">
+                  <h3 className="text-2xl font-semibold">
+                    Cần trao đổi trực tiếp?
                   </h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    Để được phản hồi nhanh hơn, hãy cung cấp càng nhiều chi tiết
-                    càng tốt về vấn đề hoặc câu hỏi của bạn.
+                  <p className="mt-2 text-sm text-white/80">
+                    Đặt lịch tư vấn miễn phí với chuyên gia của TaskFlow để nhận
+                    lộ trình triển khai phù hợp nhất.
                   </p>
-                </Card>
+                  <Button
+                    className="mt-6 w-full justify-center gap-2 rounded-xl bg-white text-indigo-600 hover:bg-white/90"
+                    asChild
+                  >
+                    <a href="mailto:hello@taskflow.vn">
+                      Đặt lịch cuộc gọi
+                      <ArrowUpRight className="h-4 w-4" />
+                    </a>
+                  </Button>
+                </div>
+              </motion.aside>
+            </div>
+          </section>
+
+          <section className="px-4 py-section-md">
+            <div className="mx-auto max-w-container-md text-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
+                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500">
+                  Câu hỏi thường gặp
+                </span>
+                <h2 className="mt-4 text-heading-lg md:text-display-sm font-semibold text-gray-900">
+                  Thông tin bạn cần chỉ cách một cú nhấp
+                </h2>
+                <p className="mt-3 text-sm md:text-base text-muted-foreground">
+                  Chọn chủ đề để tìm câu trả lời nhanh hoặc liên hệ trực tiếp nếu
+                  bạn cần hỗ trợ chuyên sâu hơn.
+                </p>
               </motion.div>
             </div>
-          </div>
-        </section>
 
-        {/* FAQ Section */}
-        <section className="py-24 px-4 bg-white">
-          <div className="container mx-auto max-w-4xl">
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-                Câu Hỏi Thường Gặp
-              </h2>
-              <p className="text-xl text-gray-600">
-                Câu trả lời nhanh cho các câu hỏi phổ biến
-              </p>
-            </motion.div>
-
-            <div className="space-y-6">
-              {faqs.map((faq, idx) => (
+            <div className="mx-auto mt-12 max-w-container-md space-y-6">
+              {faqs.map((faq, index) => (
                 <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, y: 20 }}
+                  key={faq.question}
+                  initial={{ opacity: 0, y: 16 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                  whileHover={{ y: -4 }}
+                  transition={{ duration: 0.45, delay: index * 0.08 }}
                 >
-                  <Card className="p-6 hover:shadow-xl transition-all duration-300 border-2 border-gray-100 hover:border-blue-200">
-                    <h3 className="font-bold text-lg text-gray-900 mb-3 flex items-start">
-                      <span className="text-blue-600 mr-2">Q:</span>
-                      {faq.question}
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed pl-6">
-                      <span className="text-green-600 font-bold mr-2">A:</span>
-                      {faq.answer}
-                    </p>
+                  <Card className="rounded-3xl border border-border/60 bg-white/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl backdrop-blur">
+                    <div className="flex items-start gap-4">
+                      <span className="mt-1 text-sm font-semibold text-indigo-500">
+                        Hỏi
+                      </span>
+                      <div className="space-y-3 text-left">
+                        <h3 className="text-base font-semibold text-gray-900">
+                          {faq.question}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {faq.answer}
+                        </p>
+                      </div>
+                    </div>
                   </Card>
                 </motion.div>
               ))}
             </div>
-          </div>
-        </section>
+          </section>
+        </main>
 
-        {/* Footer */}
-        <footer className="bg-gray-900 text-gray-300 py-16">
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-4 gap-12 mb-12">
+        <footer className="bg-gray-900 py-16 text-gray-300">
+          <div className="mx-auto max-w-container-lg px-4">
+            <div className="grid gap-12 md:grid-cols-4">
               <div>
-                <div className="flex items-center space-x-2 mb-4">
+                <div className="flex items-center gap-2">
                   <CheckCircle className="h-8 w-8 text-cyan-400" />
-                  <span className="text-2xl font-bold text-white">
-                    TaskFlow
-                  </span>
+                  <span className="text-2xl font-bold text-white">TaskFlow</span>
                 </div>
-                <p className="text-sm text-gray-400">
-                  Quản lý công việc hiện đại cho mọi người
+                <p className="mt-4 text-sm text-gray-400">
+                  Nền tảng quản lý công việc hiện đại cho mọi đội nhóm.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-semibold text-white mb-4">Sản Phẩm</h3>
-                <ul className="space-y-3 text-sm">
+                <h3 className="font-semibold text-white">Sản phẩm</h3>
+                <ul className="mt-4 space-y-3 text-sm">
                   <li>
                     <Link
                       to="/features"
-                      className="hover:text-cyan-400 transition-colors"
+                      className="transition-colors hover:text-cyan-400"
                     >
-                      Tính Năng
+                      Tính năng
                     </Link>
                   </li>
                   <li>
                     <Link
                       to="/about"
-                      className="hover:text-cyan-400 transition-colors"
+                      className="transition-colors hover:text-cyan-400"
                     >
-                      Về Chúng Tôi
+                      Về chúng tôi
                     </Link>
                   </li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="font-semibold text-white mb-4">Hỗ Trợ</h3>
-                <ul className="space-y-3 text-sm">
+                <h3 className="font-semibold text-white">Hỗ trợ</h3>
+                <ul className="mt-4 space-y-3 text-sm">
                   <li>
                     <Link
                       to="/contact"
-                      className="hover:text-cyan-400 transition-colors"
+                      className="transition-colors hover:text-cyan-400"
                     >
-                      Liên Hệ
+                      Liên hệ
                     </Link>
                   </li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="font-semibold text-white mb-4">Pháp Lý</h3>
-                <ul className="space-y-3 text-sm">
+                <h3 className="font-semibold text-white">Pháp lý</h3>
+                <ul className="mt-4 space-y-3 text-sm">
                   <li>
                     <a
                       href="/terms"
-                      className="hover:text-cyan-400 transition-colors"
+                      className="transition-colors hover:text-cyan-400"
                     >
-                      Điều Khoản
+                      Điều khoản
                     </a>
                   </li>
                   <li>
                     <a
                       href="/privacy"
-                      className="hover:text-cyan-400 transition-colors"
+                      className="transition-colors hover:text-cyan-400"
                     >
-                      Bảo Mật
+                      Bảo mật
                     </a>
                   </li>
                 </ul>
               </div>
             </div>
 
-            <div className="border-t border-gray-800 pt-8 text-center text-sm">
-              <p>© 2024 TaskFlow. Được tạo với ❤️ tại Việt Nam</p>
+            <div className="mt-12 border-t border-gray-800 pt-8 text-center text-sm text-gray-500">
+              © 2024 TaskFlow. Được tạo với ❤️ tại Việt Nam.
             </div>
           </div>
         </footer>
