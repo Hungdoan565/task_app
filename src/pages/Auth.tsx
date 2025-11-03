@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,14 @@ export default function AuthPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [formMessage, setFormMessage] = useState<
+    { type: "success" | "error"; text: string }
+  | null>(null);
+
+  useEffect(() => {
+    setErrors({});
+    setFormMessage(null);
+  }, [mode]);
 
   const {
     user,
@@ -71,9 +79,18 @@ export default function AuthPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const getErrorMessage = (error: unknown) => {
+    if (error && typeof error === "object" && "message" in error) {
+      const message = (error as { message?: string }).message;
+      if (message) return message;
+    }
+    return "Đã có lỗi xảy ra, vui lòng thử lại.";
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
+    setFormMessage(null);
 
     if (!validateForm()) {
       return;
@@ -84,12 +101,23 @@ export default function AuthPage() {
     try {
       if (mode === "signin") {
         await signIn(email, password);
+        setFormMessage({ type: "success", text: "Đăng nhập thành công." });
       } else if (mode === "signup") {
         await signUp(email, password, fullName);
+        setFormMessage({
+          type: "success",
+          text: "Tạo tài khoản thành công! Bạn có thể bắt đầu sử dụng TaskFlow ngay.",
+        });
       } else if (mode === "forgot") {
         await resetPassword(email);
         setMode("signin");
+        setFormMessage({
+          type: "success",
+          text: "Chúng tôi đã gửi liên kết đặt lại mật khẩu. Vui lòng kiểm tra email.",
+        });
       }
+    } catch (error) {
+      setFormMessage({ type: "error", text: getErrorMessage(error) });
     } finally {
       setLoading(false);
     }
@@ -97,14 +125,34 @@ export default function AuthPage() {
 
   const handleGoogleSignIn = async () => {
     setLoading(true);
-    await signInWithGoogle();
-    setLoading(false);
+    setFormMessage(null);
+    try {
+      await signInWithGoogle();
+      setFormMessage({
+        type: "success",
+        text: "Đăng nhập với Google thành công.",
+      });
+    } catch (error) {
+      setFormMessage({ type: "error", text: getErrorMessage(error) });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGithubSignIn = async () => {
     setLoading(true);
-    await signInWithGithub();
-    setLoading(false);
+    setFormMessage(null);
+    try {
+      await signInWithGithub();
+      setFormMessage({
+        type: "success",
+        text: "Đăng nhập với GitHub thành công.",
+      });
+    } catch (error) {
+      setFormMessage({ type: "error", text: getErrorMessage(error) });
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Animation variants
@@ -149,13 +197,13 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen flex bg-slate-50">
       {/* Left Side - Branding */}
       <motion.div
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="hidden lg:flex lg:w-[45%] bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden"
+        className="relative hidden overflow-hidden bg-gradient-to-br from-indigo-600 via-blue-600 to-indigo-700 lg:flex lg:w-[45%]"
       >
         {/* Subtle pattern overlay */}
         <div className="absolute inset-0 opacity-5">
@@ -173,13 +221,13 @@ export default function AuthPage() {
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 0.1 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="absolute top-0 right-0 w-96 h-96 bg-indigo-500 rounded-full blur-3xl"
+          className="absolute top-0 right-0 h-96 w-96 rounded-full bg-indigo-400 blur-3xl"
         />
         <motion.div
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 0.1 }}
           transition={{ duration: 1, delay: 0.4 }}
-          className="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500 rounded-full blur-3xl"
+          className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-blue-400 blur-3xl"
         />
 
         <div className="relative z-10 flex flex-col justify-center pl-32 xl:pl-60 pr-16 py-12">
@@ -256,25 +304,25 @@ export default function AuthPage() {
       </motion.div>
 
       {/* Right Side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8 relative">
+      <div className="relative flex flex-1 items-center justify-center p-6 md:p-10">
         {/* Background overlay for form area */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.9 }}
           transition={{ duration: 0.5 }}
-          className="absolute inset-0 bg-slate-50 backdrop-blur-sm"
+          className="absolute inset-0 bg-white/90 backdrop-blur-sm"
         />
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="w-full max-w-[480px] relative z-10"
+          className="relative z-10 w-full max-w-[500px]"
         >
           {/* Mobile Logo */}
           <Link
             to="/"
-            className="flex lg:hidden items-center justify-center space-x-2 mb-8"
+            className="mb-8 flex items-center justify-center space-x-2 lg:hidden"
           >
             <CheckCircle className="h-8 w-8 text-indigo-600" />
             <span className="text-2xl font-bold text-slate-900">TaskFlow</span>
@@ -309,6 +357,28 @@ export default function AuthPage() {
                 </CardHeader>
 
                 <CardContent>
+                  <AnimatePresence>
+                    {formMessage && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        className={`mb-4 flex items-start gap-3 rounded-2xl border px-4 py-3 text-sm font-medium ${
+                          formMessage.type === "success"
+                            ? "border-emerald-100 bg-emerald-50 text-emerald-700"
+                            : "border-rose-100 bg-rose-50 text-rose-600"
+                        }`}
+                      >
+                        {formMessage.type === "success" ? (
+                          <CheckCircle className="mt-0.5 h-5 w-5" />
+                        ) : (
+                          <AlertCircle className="mt-0.5 h-5 w-5" />
+                        )}
+                        <span className="leading-relaxed">{formMessage.text}</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <AnimatePresence mode="wait">
                       {mode === "signup" && (
@@ -610,13 +680,13 @@ export default function AuthPage() {
                       >
                         <Button
                           type="submit"
-                          className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-md hover:shadow-lg transition-all duration-200"
+                          className="cta-base cta-animated cta-primary w-full h-11 justify-center text-sm"
                           disabled={loading}
                           tabIndex={0}
                         >
                           {loading ? (
                             <div className="flex items-center">
-                              <div className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                              <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                               Đang xử lý...
                             </div>
                           ) : (
@@ -658,10 +728,10 @@ export default function AuthPage() {
                         >
                           <Button
                             type="button"
-                            variant="outline"
+                          variant="outline"
                             onClick={handleGoogleSignIn}
                             disabled={loading}
-                            className="w-full h-11 border-slate-300 hover:bg-slate-50 hover:border-slate-400 font-medium transition-all duration-200"
+                          className="cta-base w-full h-11 justify-center gap-2 border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md"
                             tabIndex={0}
                           >
                             <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
@@ -695,11 +765,11 @@ export default function AuthPage() {
                             variant="outline"
                             onClick={handleGithubSignIn}
                             disabled={loading}
-                            className="w-full h-11 border-slate-300 hover:bg-slate-50 hover:border-slate-400 font-medium transition-all duration-200"
+                          className="cta-base w-full h-11 justify-center gap-2 border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md"
                             tabIndex={0}
                           >
                             <svg
-                              className="mr-2 h-5 w-5"
+                            className="mr-2 h-5 w-5"
                               fill="currentColor"
                               viewBox="0 0 24 24"
                             >
@@ -769,11 +839,11 @@ export default function AuthPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            className="text-center mt-6"
+            className="mt-6 text-center"
           >
             <Link
               to="/"
-              className="text-sm text-slate-600 hover:text-slate-900 transition-colors inline-flex items-center"
+              className="inline-flex items-center gap-2 text-sm text-slate-500 transition-colors hover:text-slate-800"
               tabIndex={0}
             >
               ← Về trang chủ

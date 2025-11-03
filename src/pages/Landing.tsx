@@ -639,18 +639,51 @@ export default function LandingPage() {
                   </li>
                   <li>
                     <Link
-                      to="/about"
+                      to="/downloads"
                       className="hover:text-indigo-400 transition-colors"
                     >
-                      Về Chúng Tôi
+                      Downloads
                     </Link>
                   </li>
                   <li>
                     <Link
-                      to="/dashboard"
+                      to="/pricing"
                       className="hover:text-indigo-400 transition-colors"
                     >
-                      Dashboard
+                      Pricing
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Solutions */}
+              <div>
+                <h3 className="font-semibold text-white mb-4 text-sm md:text-base">
+                  Giải Pháp
+                </h3>
+                <ul className="space-y-3 text-sm">
+                  <li>
+                    <Link
+                      to="/ai-development"
+                      className="hover:text-indigo-400 transition-colors"
+                    >
+                      AI Development
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/enterprise"
+                      className="hover:text-indigo-400 transition-colors"
+                    >
+                      Enterprise
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/about"
+                      className="hover:text-indigo-400 transition-colors"
+                    >
+                      Về Chúng Tôi
                     </Link>
                   </li>
                 </ul>
@@ -671,36 +704,19 @@ export default function LandingPage() {
                     </Link>
                   </li>
                   <li>
+                    <Link
+                      to="/dashboard"
+                      className="hover:text-indigo-400 transition-colors"
+                    >
+                      Dashboard
+                    </Link>
+                  </li>
+                  <li>
                     <a
                       href="/help"
                       className="hover:text-indigo-400 transition-colors"
                     >
-                      Trợ Giúp
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Legal */}
-              <div>
-                <h3 className="font-semibold text-white mb-4 text-sm md:text-base">
-                  Pháp Lý
-                </h3>
-                <ul className="space-y-3 text-sm">
-                  <li>
-                    <a
-                      href="/terms"
-                      className="hover:text-indigo-400 transition-colors"
-                    >
-                      Điều Khoản
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="/privacy"
-                      className="hover:text-indigo-400 transition-colors"
-                    >
-                      Bảo Mật
+                      Trung Tâm Trợ Giúp
                     </a>
                   </li>
                 </ul>

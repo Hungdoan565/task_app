@@ -1,7 +1,8 @@
 import { FormEvent, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
+  AlertCircle,
   ArrowUpRight,
   CheckCircle,
   Clock,
@@ -136,9 +137,21 @@ export default function ContactPage() {
     subject: "Câu Hỏi Chung",
     message: "",
   });
+  const [formMessage, setFormMessage] = useState<
+    { type: "success" | "error"; text: string }
+  | null>(null);
+
+  const getErrorMessage = (error: unknown) => {
+    if (error && typeof error === "object" && "message" in error) {
+      const { message } = error as { message?: string };
+      if (message) return message;
+    }
+    return "Không thể gửi tin nhắn. Vui lòng thử lại.";
+  };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    setFormMessage(null);
     setLoading(true);
 
     try {
@@ -158,6 +171,11 @@ export default function ContactPage() {
         description: "Chúng tôi sẽ phản hồi trong vòng 24 giờ làm việc.",
       });
 
+      setFormMessage({
+        type: "success",
+        text: "Chúng tôi đã nhận được tin nhắn. Đội ngũ TaskFlow sẽ phản hồi trong vòng 24 giờ làm việc.",
+      });
+
       setFormData({
         name: "",
         email: "",
@@ -171,6 +189,7 @@ export default function ContactPage() {
         variant: "destructive",
       });
       console.error("Error sending message:", error);
+      setFormMessage({ type: "error", text: getErrorMessage(error) });
     } finally {
       setLoading(false);
     }
@@ -265,144 +284,60 @@ export default function ContactPage() {
           </section>
 
           <section className="px-4 py-section-md">
-            <div className="mx-auto grid max-w-container-lg gap-12 lg:grid-cols-[1.9fr,1.1fr]">
-              <div className="space-y-10">
-                <div>
-                  <span className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500">
-                    Kênh liên hệ chính thức
-                  </span>
-                  <h2 className="mt-4 text-heading-lg md:text-display-sm font-semibold text-gray-900">
-                    Chọn kênh phù hợp với nhu cầu của bạn
-                  </h2>
-                  <p className="mt-3 max-w-2xl text-sm md:text-base text-muted-foreground">
-                    Từ email hỗ trợ đến các buổi tư vấn trực tiếp, chúng tôi luôn
-                    duy trì sự nhất quán về chất lượng và tốc độ phản hồi.
-                  </p>
-                </div>
-
-                <div className="grid gap-6 sm:grid-cols-2">
-                  {contactInfo.map((info, index) => (
-                    <motion.div
-                      key={info.title}
-                      initial={{ opacity: 0, y: 14 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.4, delay: index * 0.08 }}
-                    >
-                      <Card className="relative h-full overflow-hidden rounded-3xl border border-border/60 bg-white/80 p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl backdrop-blur">
-                        <div
-                          className={`inline-flex items-center justify-center rounded-2xl bg-gradient-to-r ${info.gradient} p-4 text-white shadow-lg`}
-                        >
-                          <info.icon className="h-6 w-6" />
-                        </div>
-                        <h3 className="mt-5 text-lg font-semibold text-gray-900">
-                          {info.title}
-                        </h3>
-                        <div className="mt-3 space-y-1 text-sm text-muted-foreground">
-                          {info.details.map((detail) => (
-                            <p key={detail}>{detail}</p>
-                          ))}
-                        </div>
-                      </Card>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-
+            <div className="mx-auto grid max-w-container-lg gap-10 lg:grid-cols-[1.7fr,1fr]">
               <motion.div
-                className="rounded-3xl border border-indigo-200/60 bg-indigo-50/60 p-8 shadow-inner backdrop-blur"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.12 }}
-              >
-                <div>
-                  <h3 className="text-heading-sm font-semibold text-indigo-900">
-                    Đội ngũ hỗ trợ chuyên sâu
-                  </h3>
-                  <p className="mt-2 text-sm text-indigo-700">
-                    Mỗi kênh đều có SLA rõ ràng và được vận hành bởi những
-                    chuyên gia giàu kinh nghiệm triển khai TaskFlow cho doanh
-                    nghiệp.
-                  </p>
-                </div>
-
-                <div className="mt-6 space-y-5">
-                  {supportChannels.map((channel) => (
-                    <div
-                      key={channel.title}
-                      className="group relative overflow-hidden rounded-2xl border border-white/60 bg-white/80 p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-lg backdrop-blur"
-                    >
-                      <div className="flex items-start gap-4">
-                        <span className="rounded-xl bg-indigo-100 p-3 text-indigo-600">
-                          <channel.icon className="h-5 w-5" />
-                        </span>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <h4 className="text-base font-semibold text-gray-900">
-                              {channel.title}
-                            </h4>
-                            {channel.badge && (
-                              <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[11px] font-semibold uppercase text-indigo-600">
-                                {channel.badge}
-                              </span>
-                            )}
-                          </div>
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            {channel.description}
-                          </p>
-                        </div>
-                        <ArrowUpRight className="mt-1 hidden h-4 w-4 text-indigo-400 group-hover:block" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            </div>
-          </section>
-
-          <section className="bg-gradient-to-b from-white via-indigo-50/40 to-white px-4 py-section-md">
-            <div className="mx-auto grid max-w-container-lg gap-10 lg:grid-cols-[1.6fr,1fr]">
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5 }}
-                className="relative overflow-hidden rounded-3xl border border-border/50 bg-white/90 p-10 shadow-xl backdrop-blur"
               >
-                <motion.div
-                  className="absolute -top-20 -right-16 h-52 w-52 rounded-full bg-indigo-500/10 blur-3xl"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
-                />
+                <Card className="relative overflow-hidden rounded-3xl border border-border/60 bg-white/90 p-10 shadow-xl backdrop-blur">
+                  <motion.div
+                    className="absolute -top-24 right-10 h-48 w-48 rounded-full bg-indigo-400/15 blur-3xl"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+                  />
 
-                <div className="relative">
-                  <div className="flex items-center gap-3">
+                  <div className="relative flex items-center gap-3">
                     <span className="rounded-2xl bg-indigo-100 p-3 text-indigo-600">
                       <MessageCircle className="h-6 w-6" />
                     </span>
                     <div>
                       <h2 className="text-heading-lg font-semibold text-gray-900">
-                        Gửi Tin Nhắn
+                        Gửi tin nhắn cho TaskFlow
                       </h2>
                       <p className="text-sm text-muted-foreground">
-                        Vui lòng mô tả càng chi tiết càng tốt để chúng tôi hỗ trợ
-                        hiệu quả hơn.
+                        Mô tả chi tiết để chúng tôi hỗ trợ bạn nhanh nhất.
                       </p>
                     </div>
                   </div>
 
-                  <form
-                    onSubmit={handleSubmit}
-                    className="mt-8 grid gap-6"
-                    noValidate
-                  >
+                  <AnimatePresence>
+                    {formMessage && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        className={`mt-6 flex items-start gap-3 rounded-2xl border px-4 py-3 text-sm font-medium ${
+                          formMessage.type === "success"
+                            ? "border-emerald-100 bg-emerald-50 text-emerald-700"
+                            : "border-rose-100 bg-rose-50 text-rose-600"
+                        }`}
+                      >
+                        {formMessage.type === "success" ? (
+                          <CheckCircle className="mt-0.5 h-5 w-5" />
+                        ) : (
+                          <AlertCircle className="mt-0.5 h-5 w-5" />
+                        )}
+                        <span className="leading-relaxed">{formMessage.text}</span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <form onSubmit={handleSubmit} className="mt-8 grid gap-6" noValidate>
                     <div className="grid gap-6 sm:grid-cols-2">
                       <div>
-                        <Label
-                          htmlFor="name"
-                          className="text-sm font-semibold text-gray-900"
-                        >
+                        <Label htmlFor="name" className="text-sm font-semibold text-gray-900">
                           Họ và tên *
                         </Label>
                         <Input
@@ -419,10 +354,7 @@ export default function ContactPage() {
                       </div>
 
                       <div>
-                        <Label
-                          htmlFor="email"
-                          className="text-sm font-semibold text-gray-900"
-                        >
+                        <Label htmlFor="email" className="text-sm font-semibold text-gray-900">
                           Email *
                         </Label>
                         <Input
@@ -440,10 +372,7 @@ export default function ContactPage() {
                     </div>
 
                     <div>
-                      <Label
-                        htmlFor="subject"
-                        className="text-sm font-semibold text-gray-900"
-                      >
+                      <Label htmlFor="subject" className="text-sm font-semibold text-gray-900">
                         Chủ đề *
                       </Label>
                       <Select
@@ -456,12 +385,8 @@ export default function ContactPage() {
                           <SelectValue placeholder="Chủ đề bạn quan tâm" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Câu Hỏi Chung">
-                            Câu Hỏi Chung
-                          </SelectItem>
-                          <SelectItem value="Hỗ Trợ Kỹ Thuật">
-                            Hỗ Trợ Kỹ Thuật
-                          </SelectItem>
+                          <SelectItem value="Câu Hỏi Chung">Câu Hỏi Chung</SelectItem>
+                          <SelectItem value="Hỗ Trợ Kỹ Thuật">Hỗ Trợ Kỹ Thuật</SelectItem>
                           <SelectItem value="Đề Xuất Tính Năng">
                             Đề Xuất Tính Năng
                           </SelectItem>
@@ -473,10 +398,7 @@ export default function ContactPage() {
                     </div>
 
                     <div>
-                      <Label
-                        htmlFor="message"
-                        className="text-sm font-semibold text-gray-900"
-                      >
+                      <Label htmlFor="message" className="text-sm font-semibold text-gray-900">
                         Tin nhắn *
                       </Label>
                       <Textarea
@@ -498,110 +420,137 @@ export default function ContactPage() {
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                       <Button
                         type="submit"
-                        size="lg"
-                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-600 px-6 py-3 text-base font-semibold text-white shadow-lg transition-all duration-300 hover:from-indigo-700 hover:via-blue-700 hover:to-sky-700 hover:shadow-xl"
+                        className="cta-base cta-animated cta-primary w-full h-12 justify-center text-base"
                         disabled={loading}
                       >
                         {loading ? (
-                          <>
+                          <span className="flex items-center gap-2">
                             <motion.span
                               className="h-5 w-5"
                               animate={{ rotate: 360 }}
-                              transition={{
-                                duration: 1,
-                                repeat: Infinity,
-                                ease: "linear",
-                              }}
+                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                             >
                               <span className="block h-full w-full rounded-full border-2 border-white border-t-transparent" />
                             </motion.span>
                             Đang gửi...
-                          </>
+                          </span>
                         ) : (
-                          <>
+                          <span className="flex items-center gap-2">
                             Gửi tin nhắn
                             <Send className="h-5 w-5" />
-                          </>
+                          </span>
                         )}
                       </Button>
                     </motion.div>
                   </form>
-                </div>
+                </Card>
               </motion.div>
 
               <motion.aside
                 className="space-y-6"
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
-                <Card className="rounded-3xl border border-border/60 bg-white/80 p-8 shadow-lg backdrop-blur">
+                <Card className="rounded-3xl border border-border/60 bg-white/80 p-8 shadow-md backdrop-blur">
                   <h3 className="text-heading-sm font-semibold text-gray-900">
-                    Làm việc cùng chúng tôi
+                    Liên hệ trực tiếp
                   </h3>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Đảm bảo thông tin quan trọng được ưu tiên xử lý trong phiên
-                    đầu tiên.
+                    Chọn kênh mềm dẻo nhất cho nhu cầu của bạn.
                   </p>
-                  <ul className="mt-6 space-y-4 text-sm text-muted-foreground">
-                    <li className="flex gap-3">
-                      <span className="mt-1 h-2.5 w-2.5 rounded-full bg-indigo-500" />
-                      Chúng tôi phản hồi mọi yêu cầu trong vòng 1 ngày làm việc.
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="mt-1 h-2.5 w-2.5 rounded-full bg-indigo-500" />
-                      Người dùng gói Pro được ưu tiên hỗ trợ trong giờ hành chính.
-                    </li>
-                    <li className="flex gap-3">
-                      <span className="mt-1 h-2.5 w-2.5 rounded-full bg-indigo-500" />
-                      Với yêu cầu triển khai quy mô lớn, chúng tôi có đội dự án
-                      riêng.
-                    </li>
-                  </ul>
+                  <div className="mt-6 space-y-4">
+                    {contactInfo.map((info) => (
+                      <div key={info.title} className="flex gap-4 rounded-2xl border border-border/40 bg-white/70 p-4">
+                        <span className={`rounded-xl bg-gradient-to-r ${info.gradient} p-3 text-white shadow-lg`}>
+                          <info.icon className="h-5 w-5" />
+                        </span>
+                        <div className="space-y-1 text-sm text-muted-foreground">
+                          <p className="font-semibold text-gray-900">{info.title}</p>
+                          {info.details.map((detail) => (
+                            <p key={detail}>{detail}</p>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
 
-                  <div className="mt-6 space-y-3">
-                    {quickLinks.map((link) => (
-                      <Button
-                        key={link.label}
-                        variant="outline"
-                        className="group w-full justify-between rounded-xl border border-border/60 bg-white/70 px-4 py-3 text-sm font-semibold text-foreground hover:border-indigo-200 hover:bg-indigo-50"
-                        asChild
+                <Card className="rounded-3xl border border-border/60 bg-white/80 p-8 shadow-md backdrop-blur">
+                  <h3 className="text-heading-sm font-semibold text-gray-900">
+                    Các kênh ưu tiên
+                  </h3>
+                  <div className="mt-5 space-y-4">
+                    {supportChannels.map((channel) => (
+                      <div
+                        key={channel.title}
+                        className="group flex items-start gap-4 rounded-2xl border border-border/50 bg-white/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-lg"
                       >
-                        {"to" in link ? (
-                          <Link to={link.to}>
-                            <span>{link.label}</span>
-                            <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1" />
-                          </Link>
-                        ) : (
-                          <a href={link.href} rel="noopener noreferrer">
-                            <span>{link.label}</span>
-                            <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1" />
-                          </a>
-                        )}
-                      </Button>
+                        <span className="rounded-xl bg-indigo-100 p-3 text-indigo-600">
+                          <channel.icon className="h-5 w-5" />
+                        </span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-semibold text-gray-900">
+                              {channel.title}
+                            </p>
+                            {channel.badge && (
+                              <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[11px] font-semibold uppercase text-indigo-600">
+                                {channel.badge}
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {channel.description}
+                          </p>
+                        </div>
+                        <ArrowUpRight className="mt-1 h-4 w-4 text-indigo-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                      </div>
                     ))}
                   </div>
                 </Card>
 
                 <div className="rounded-3xl bg-gradient-to-br from-indigo-600 via-blue-600 to-sky-500 p-8 text-white shadow-xl">
-                  <h3 className="text-2xl font-semibold">
-                    Cần trao đổi trực tiếp?
-                  </h3>
+                  <h3 className="text-2xl font-semibold">Cần trao đổi trực tiếp?</h3>
                   <p className="mt-2 text-sm text-white/80">
-                    Đặt lịch tư vấn miễn phí với chuyên gia của TaskFlow để nhận
-                    lộ trình triển khai phù hợp nhất.
+                    Đặt lịch tư vấn miễn phí với chuyên gia của TaskFlow để nhận lộ trình triển khai phù hợp nhất.
                   </p>
-                  <Button
-                    className="mt-6 w-full justify-center gap-2 rounded-xl bg-white text-indigo-600 hover:bg-white/90"
-                    asChild
-                  >
+                  <Button className="cta-base cta-outline-light mt-6 w-full justify-center gap-2 text-sm" asChild>
                     <a href="mailto:hello@taskflow.vn">
                       Đặt lịch cuộc gọi
                       <ArrowUpRight className="h-4 w-4" />
                     </a>
                   </Button>
                 </div>
+
+                <Card className="rounded-3xl border border-border/60 bg-white/80 p-8 shadow-md backdrop-blur">
+                  <h3 className="text-heading-sm font-semibold text-gray-900">
+                    Tài nguyên nhanh
+                  </h3>
+                  <div className="mt-4 space-y-3">
+                    {quickLinks.map((link) => (
+                      <Button
+                        key={link.label}
+                        variant="outline"
+                        className="cta-base w-full justify-between rounded-xl border border-border/60 bg-white/70 px-4 py-3 text-sm font-semibold text-foreground hover:border-indigo-200 hover:bg-indigo-50"
+                        asChild
+                      >
+                        {"to" in link ? (
+                          <Link to={link.to}>
+                            <span>{link.label}</span>
+                            <ArrowUpRight className="h-4 w-4" />
+                          </Link>
+                        ) : (
+                          <a href={link.href} rel="noopener noreferrer">
+                            <span>{link.label}</span>
+                            <ArrowUpRight className="h-4 w-4" />
+                          </a>
+                        )}
+                      </Button>
+                    ))}
+                  </div>
+                </Card>
               </motion.aside>
             </div>
           </section>

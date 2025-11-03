@@ -107,4 +107,95 @@
     transition-duration: 0.2s;
     transition-timing-function: ease-out;
   }
+
+  @keyframes cta-breathe {
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+      box-shadow: 0 12px 28px rgb(79 70 229 / 0.16);
+    }
+    50% {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 18px 36px rgb(37 99 235 / 0.24);
+    }
+  }
+
+  @keyframes cta-gradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+}
+
+@layer utilities {
+  .cta-base {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-full font-semibold shadow-lg transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent;
+    transform: translateZ(0);
+  }
+
+  .cta-base:hover {
+    transform: translateY(-3px) scale(1.01);
+    @apply shadow-xl;
+  }
+
+  .cta-base:active {
+    transform: translateY(-1px);
+    @apply shadow-lg;
+  }
+
+  .cta-animated {
+    animation: cta-breathe 6s ease-in-out infinite;
+  }
+
+  .cta-primary {
+    @apply overflow-hidden bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 text-white;
+    background-size: 200% auto;
+    animation: cta-gradient 8s linear infinite, cta-breathe 6s ease-in-out infinite;
+  }
+
+  .cta-primary:hover {
+    background-position: 100% 50%;
+    @apply shadow-2xl;
+  }
+
+  .cta-primary::after {
+    content: "";
+    position: absolute;
+    top: -25%;
+    bottom: -25%;
+    left: -40%;
+    right: -40%;
+    background: linear-gradient(120deg, transparent 0%, rgb(255 255 255 / 0.35) 45%, transparent 100%);
+    opacity: 0;
+    transform: translateX(-60%) skewX(-20deg);
+    transition: transform 0.6s ease, opacity 0.6s ease;
+  }
+
+  .cta-primary:hover::after {
+    opacity: 1;
+    transform: translateX(60%) skewX(-20deg);
+  }
+
+  .cta-outline-light {
+    @apply border border-white/70 bg-white/10 text-white shadow-lg;
+    backdrop-filter: blur(2px);
+  }
+
+  .cta-outline-light:hover {
+    @apply border-white bg-white/20 text-white shadow-xl;
+  }
+
+  .cta-outline-indigo {
+    @apply border border-indigo-400/80 bg-transparent text-indigo-200 shadow-lg;
+  }
+
+  .cta-outline-indigo:hover {
+    @apply border-indigo-300 bg-indigo-500/20 text-white shadow-xl;
+  }
 }

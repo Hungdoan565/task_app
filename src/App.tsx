@@ -8,6 +8,10 @@ import Auth from "./pages/Auth";
 import Features from "./pages/Features";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import Downloads from "./pages/Downloads";
+import Pricing from "./pages/Pricing";
+import AIDevelopment from "./pages/AIDevelopment";
+import Enterprise from "./pages/Enterprise";
 import Dashboard from "./pages/Dashboard";
 
 function App() {
@@ -21,6 +25,10 @@ function App() {
           <Route path="/signin" element={<Auth />} />
           <Route path="/signup" element={<Auth />} />
           <Route path="/features" element={<Features />} />
+          <Route path="/downloads" element={<Downloads />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/ai-development" element={<AIDevelopment />} />
+          <Route path="/enterprise" element={<Enterprise />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
 
