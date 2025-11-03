@@ -1,0 +1,109 @@
+/**
+ * Accessibility Enhancements
+ * Focus styles, keyboard navigation, and screen reader utilities
+ */
+
+/* Enhanced focus styles for keyboard navigation */
+.focus-visible {
+  @apply outline-none ring-2 ring-indigo-500 ring-offset-2 ring-offset-white;
+}
+
+/* Skip to content link (visible on focus) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.focus\:not-sr-only:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --border-width: 2px;
+  }
+  
+  .border {
+    border-width: var(--border-width, 1px);
+  }
+  
+  button,
+  a {
+    outline-offset: 2px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus within for enhanced keyboard navigation */
+.focus-within\:ring:focus-within {
+  @apply ring-2 ring-indigo-500 ring-offset-2;
+}
+
+/* Improved button focus states */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  @apply outline-none ring-2 ring-indigo-500 ring-offset-2 ring-offset-white transition-shadow;
+}
+
+/* Enhanced link underlines for better visibility */
+@media not all and (prefers-reduced-transparency) {
+  a:hover {
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+}
+
+/* Color blindness considerations - ensure sufficient contrast */
+.text-success {
+  @apply text-green-700 dark:text-green-400;
+}
+
+.text-error {
+  @apply text-red-700 dark:text-red-400;
+}
+
+.text-warning {
+  @apply text-amber-700 dark:text-amber-400;
+}
+
+.bg-success {
+  @apply bg-green-100 dark:bg-green-900;
+}
+
+.bg-error {
+  @apply bg-red-100 dark:bg-red-900;
+}
+
+.bg-warning {
+  @apply bg-amber-100 dark:bg-amber-900;
+}
+

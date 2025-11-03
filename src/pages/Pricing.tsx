@@ -1,3 +1,4 @@
+import { Fragment, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -12,11 +13,17 @@ import NavigationBar from "@/components/layout/NavigationBar";
 import SEO from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import BillingToggle from "@/components/pricing/BillingToggle";
+import ROICalculator from "@/components/pricing/ROICalculator";
 
 const pricingTiers = [
   {
     name: "Free",
     price: "0₫",
+    monthlyPrice: "0₫",
+    annualPrice: "0₫",
+    monthlyValue: 0,
+    annualValue: 0,
     cadence: "vĩnh viễn",
     badge: "Phổ biến",
     icon: Sparkles,
@@ -27,7 +34,10 @@ const pricingTiers = [
   },
   {
     name: "Pro",
-    price: "99.000₫",
+    monthlyPrice: "99.000₫",
+    annualPrice: "950.000₫",
+    monthlyValue: 99000,
+    annualValue: 950000,
     cadence: "mỗi tháng",
     badge: "Đội nhóm",
     icon: Users,
@@ -42,7 +52,10 @@ const pricingTiers = [
   },
   {
     name: "AI Premium",
-    price: "299.000₫",
+    monthlyPrice: "299.000₫",
+    annualPrice: "2.870.000₫",
+    monthlyValue: 299000,
+    annualValue: 2870000,
     cadence: "mỗi tháng",
     badge: "AI Automation",
     icon: Crown,
@@ -59,17 +72,53 @@ const pricingTiers = [
 ];
 
 const comparisonFeatures = [
-  { label: "Số lượng projects", free: "5", pro: "Không giới hạn", ai: "Không giới hạn" },
   {
-    label: "Tự động hoá",
-    free: false,
-    pro: true,
-    ai: "AI recipes + Workflow builder",
+    category: "Quản lý công việc",
+    features: [
+      { label: "Số lượng projects", free: "5", pro: "Không giới hạn", ai: "Không giới hạn" },
+      { label: "Số lượng tasks/project", free: "50", pro: "Không giới hạn", ai: "Không giới hạn" },
+      { label: "Số thành viên", free: "5", pro: "Không giới hạn", ai: "Không giới hạn" },
+      { label: "File storage", free: "100 MB", pro: "10 GB", ai: "100 GB" },
+      { label: "Timeline view", free: false, pro: true, ai: true },
+      { label: "Kanban board", free: true, pro: true, ai: true },
+      { label: "Calendar view", free: true, pro: true, ai: true },
+      { label: "Gantt chart", free: false, pro: true, ai: true },
+    ],
   },
-  { label: "Quyền truy cập nâng cao", free: false, pro: true, ai: true },
-  { label: "AI Task Assistant", free: "Giới hạn 20 yêu cầu/tháng", pro: true, ai: "Không giới hạn" },
-  { label: "Bảng phân tích & báo cáo", free: false, pro: "Cơ bản", ai: "Nâng cao + tuỳ chỉnh" },
-  { label: "Hỗ trợ ưu tiên", free: false, pro: "Trong giờ hành chính", ai: "24/7 + CSM riêng" },
+  {
+    category: "Tự động hoá & Tích hợp",
+    features: [
+      { label: "Workflow automation", free: false, pro: "50 automation/tháng", ai: "Không giới hạn" },
+      { label: "Custom templates", free: "3", pro: "Không giới hạn", ai: "Không giới hạn" },
+      { label: "Tích hợp bên thứ 3", free: "3 apps", pro: "Không giới hạn", ai: "Không giới hạn" },
+      { label: "API access", free: false, pro: true, ai: true },
+      { label: "Webhooks", free: false, pro: true, ai: true },
+      { label: "AI workflow builder", free: false, pro: false, ai: true },
+    ],
+  },
+  {
+    category: "AI & Phân tích",
+    features: [
+      { label: "AI Task Assistant", free: "20 yêu cầu/tháng", pro: "200 yêu cầu/tháng", ai: "Không giới hạn" },
+      { label: "Smart suggestions", free: false, pro: true, ai: true },
+      { label: "Predictive analytics", free: false, pro: false, ai: true },
+      { label: "Custom reports", free: false, pro: "Cơ bản", ai: "Nâng cao" },
+      { label: "Dashboard analytics", free: "Cơ bản", pro: "Nâng cao", ai: "Enterprise-grade" },
+      { label: "Export data", free: "CSV", pro: "CSV, Excel, PDF", ai: "CSV, Excel, PDF, API" },
+    ],
+  },
+  {
+    category: "Bảo mật & Hỗ trợ",
+    features: [
+      { label: "2-Factor authentication", free: true, pro: true, ai: true },
+      { label: "Role-based permissions", free: false, pro: true, ai: true },
+      { label: "Activity logs", free: "7 ngày", pro: "90 ngày", ai: "Không giới hạn" },
+      { label: "Data backup", free: "Hàng tuần", pro: "Hàng ngày", ai: "Real-time" },
+      { label: "SSO/SAML", free: false, pro: false, ai: true },
+      { label: "Hỗ trợ", free: "Community", pro: "Email (24h)", ai: "24/7 + CSM riêng" },
+      { label: "SLA guarantee", free: false, pro: false, ai: "99.9%" },
+    ],
+  },
 ];
 
 const faqs = [
@@ -96,6 +145,17 @@ const faqs = [
 ];
 
 export default function PricingPage() {
+  const [billingPeriod, setBillingPeriod] = useState<"monthly" | "annual">("monthly");
+
+  const getPrice = (tier: typeof pricingTiers[number]) => {
+    if (tier.name === "Free") return tier.price;
+    return billingPeriod === "monthly" ? tier.monthlyPrice : tier.annualPrice;
+  };
+
+  const getCadence = () => {
+    return billingPeriod === "monthly" ? "mỗi tháng" : "mỗi năm";
+  };
+
   return (
     <>
       <SEO
@@ -107,7 +167,7 @@ export default function PricingPage() {
       <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/60 to-white text-foreground">
         <NavigationBar />
 
-        <main className="pt-32">
+        <main id="main-content" className="pt-32">
           <section className="relative overflow-hidden pb-24">
             <div className="absolute inset-0">
               <motion.div
@@ -148,14 +208,26 @@ export default function PricingPage() {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground md:text-xl"
               >
-                Từ cá nhân đến doanh nghiệp, TaskFlow mang đến công cụ quản lý công việc
-                mạnh mẽ, dễ dùng và luôn sẵn sàng mở rộng khi đội nhóm của bạn phát
-                triển.
-              </motion.p>
-            </div>
-          </section>
+              Từ cá nhân đến doanh nghiệp, TaskFlow mang đến công cụ quản lý công việc
+              mạnh mẽ, dễ dùng và luôn sẵn sàng mở rộng khi đội nhóm của bạn phát
+              triển.
+            </motion.p>
 
-          <section className="px-4 pb-24">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <BillingToggle
+                value={billingPeriod}
+                onChange={setBillingPeriod}
+                annualDiscount={20}
+              />
+            </motion.div>
+          </div>
+        </section>
+
+        <section className="px-4 pb-24">
             <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-3">
               {pricingTiers.map((tier) => (
                 <motion.div
@@ -181,9 +253,14 @@ export default function PricingPage() {
                       </span>
                     </div>
                     <div className="mt-6 flex items-end gap-2">
-                      <p className="text-4xl font-semibold text-slate-900">{tier.price}</p>
-                      <p className="text-sm text-slate-500">/{tier.cadence}</p>
+                      <p className="text-4xl font-semibold text-slate-900">{getPrice(tier)}</p>
+                      <p className="text-sm text-slate-500">/{tier.name === "Free" ? tier.cadence : getCadence()}</p>
                     </div>
+                    {billingPeriod === "annual" && tier.name !== "Free" && (
+                      <p className="mt-2 text-xs text-slate-500">
+                        {(tier.annualValue / 12).toLocaleString('vi-VN')}₫/tháng khi thanh toán hàng năm
+                      </p>
+                    )}
                     <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
                       {tier.description}
                     </p>
@@ -234,67 +311,87 @@ export default function PricingPage() {
                 </Button>
               </div>
 
-              <div className="mt-8 overflow-hidden rounded-2xl border border-slate-200">
-                <table className="w-full min-w-[720px] divide-y divide-slate-200 text-left">
+              <div className="mt-8 overflow-x-auto rounded-2xl border border-slate-200">
+                <table className="w-full min-w-[720px] text-left">
                   <thead className="bg-slate-50">
                     <tr className="text-sm text-slate-500">
                       <th className="px-6 py-4 font-medium">Tính năng</th>
-                      <th className="px-6 py-4 font-medium">Free</th>
-                      <th className="px-6 py-4 font-medium">Pro</th>
-                      <th className="px-6 py-4 font-medium">AI Premium</th>
+                      <th className="px-6 py-4 font-medium text-center">Free</th>
+                      <th className="px-6 py-4 font-medium text-center">Pro</th>
+                      <th className="px-6 py-4 font-medium text-center">AI Premium</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 text-sm text-slate-700">
-                    {comparisonFeatures.map((feature) => (
-                      <tr key={feature.label} className="hover:bg-slate-50/70">
-                        <td className="px-6 py-4 font-medium text-slate-900">
-                          {feature.label}
-                        </td>
-                        <td className="px-6 py-4">
-                          {typeof feature.free === "boolean" ? (
-                            feature.free ? (
-                              <span className="flex items-center gap-2 text-indigo-600">
-                                <Check className="h-4 w-4" /> Có
-                              </span>
-                            ) : (
-                              <span className="text-slate-400">—</span>
-                            )
-                          ) : (
-                            feature.free
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          {typeof feature.pro === "boolean" ? (
-                            feature.pro ? (
-                              <span className="flex items-center gap-2 text-indigo-600">
-                                <Check className="h-4 w-4" /> Có
-                              </span>
-                            ) : (
-                              <span className="text-slate-400">—</span>
-                            )
-                          ) : (
-                            feature.pro
-                          )}
-                        </td>
-                        <td className="px-6 py-4">
-                          {typeof feature.ai === "boolean" ? (
-                            feature.ai ? (
-                              <span className="flex items-center gap-2 text-indigo-600">
-                                <Check className="h-4 w-4" /> Có
-                              </span>
-                            ) : (
-                              <span className="text-slate-400">—</span>
-                            )
-                          ) : (
-                            feature.ai
-                          )}
-                        </td>
-                      </tr>
+                  <tbody className="text-sm text-slate-700">
+                    {comparisonFeatures.map((category) => (
+                      <Fragment key={category.category}>
+                        <tr className="bg-slate-100/50">
+                          <td
+                            colSpan={4}
+                            className="px-6 py-3 text-xs font-semibold uppercase tracking-wider text-slate-600"
+                          >
+                            {category.category}
+                          </td>
+                        </tr>
+                        {category.features.map((feature) => (
+                          <tr
+                            key={`${category.category}-${feature.label}`}
+                            className="border-t border-slate-200 hover:bg-slate-50/70 transition-colors"
+                          >
+                            <td className="px-6 py-4 font-medium text-slate-900">
+                              {feature.label}
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              {typeof feature.free === "boolean" ? (
+                                feature.free ? (
+                                  <span className="inline-flex items-center justify-center text-green-600">
+                                    <Check className="h-5 w-5" />
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-300">—</span>
+                                )
+                              ) : (
+                                <span className="text-slate-700">{feature.free}</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              {typeof feature.pro === "boolean" ? (
+                                feature.pro ? (
+                                  <span className="inline-flex items-center justify-center text-green-600">
+                                    <Check className="h-5 w-5" />
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-300">—</span>
+                                )
+                              ) : (
+                                <span className="text-slate-700">{feature.pro}</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              {typeof feature.ai === "boolean" ? (
+                                feature.ai ? (
+                                  <span className="inline-flex items-center justify-center text-green-600">
+                                    <Check className="h-5 w-5" />
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-300">—</span>
+                                )
+                              ) : (
+                                <span className="text-slate-700">{feature.ai}</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </Fragment>
                     ))}
                   </tbody>
                 </table>
               </div>
             </div>
+          </section>
+
+          {/* ROI Calculator Section */}
+          <section className="px-4 pb-24">
+            <ROICalculator />
           </section>
 
           <section className="px-4 pb-24">

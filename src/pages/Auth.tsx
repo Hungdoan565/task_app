@@ -23,6 +23,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import PasswordStrength from "@/components/auth/PasswordStrength";
 
 type AuthMode = "signin" | "signup" | "forgot";
 
@@ -197,7 +198,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-slate-50">
+    <main id="main-content" className="min-h-screen flex bg-slate-50">
       {/* Left Side - Branding */}
       <motion.div
         initial={{ opacity: 0, x: -50 }}
@@ -486,7 +487,7 @@ export default function AuthPage() {
                               value={password}
                               onChange={(e) => setPassword(e.target.value)}
                               required
-                              minLength={6}
+                              minLength={8}
                               className="pl-10 pr-10 h-11 transition-all duration-200"
                               tabIndex={0}
                             />
@@ -507,9 +508,7 @@ export default function AuthPage() {
                             </motion.button>
                           </motion.div>
                           {mode === "signup" && (
-                            <p className="text-xs text-slate-500">
-                              Tối thiểu 6 ký tự
-                            </p>
+                            <PasswordStrength password={password} />
                           )}
                         </motion.div>
 
@@ -552,6 +551,7 @@ export default function AuthPage() {
                                     ? "border-red-500 focus-visible:ring-red-500"
                                     : ""
                                 }`}
+                                minLength={8}
                                 tabIndex={0}
                               />
                               <motion.button
@@ -851,6 +851,6 @@ export default function AuthPage() {
           </motion.div>
         </motion.div>
       </div>
-    </div>
+    </main>
   );
 }

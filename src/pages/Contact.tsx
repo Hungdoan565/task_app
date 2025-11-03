@@ -228,7 +228,7 @@ ${supplementalDetails.join("\n")}`
       <div className="min-h-screen bg-background text-foreground">
         <NavigationBar />
 
-        <main className="relative">
+        <main id="main-content" className="relative">
           <section className="relative overflow-hidden pt-32 pb-section-md">
             <div className="absolute inset-0 bg-gradient-to-br from-indigo-100 via-white to-sky-100" />
             <motion.div

@@ -121,7 +121,7 @@ export default function EnterprisePage() {
       <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-950 to-slate-900 text-slate-100">
         <NavigationBar />
 
-        <main className="pt-32">
+        <main id="main-content" className="pt-32">
           <section className="relative overflow-hidden pb-24">
             <div className="absolute inset-0">
               <motion.div

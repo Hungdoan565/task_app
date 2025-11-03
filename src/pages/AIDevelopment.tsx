@@ -112,7 +112,7 @@ export default function AIDevelopmentPage() {
       <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 text-slate-100">
         <NavigationBar />
 
-        <main className="pt-32">
+        <main id="main-content" className="pt-32">
           <section className="relative overflow-hidden pb-24">
             <div className="absolute inset-0">
               <motion.div

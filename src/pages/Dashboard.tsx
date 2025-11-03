@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useStore } from "@/store/useStore";
 import { useWorkspaces } from "@/hooks/useWorkspaces";
 import { useTasks } from "@/hooks/useTasks";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -26,11 +27,23 @@ import {
   Users,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import EmptyState from "@/components/ui/empty-state";
+import ProductTour from "@/components/onboarding/ProductTour";
+import OnboardingChecklist from "@/components/onboarding/OnboardingChecklist";
+import OnboardingWizard, {
+  OnboardingData,
+} from "@/components/onboarding/OnboardingWizard";
+import CreateWorkspaceDialog from "@/components/workspace/CreateWorkspaceDialog";
+
+const WIZARD_STORAGE_KEY = "taskflow_onboarding_wizard_seen";
 
 export default function Dashboard() {
   const { currentWorkspace, setCurrentWorkspace } = useStore();
   const { workspaces } = useWorkspaces();
   const { tasks } = useTasks(currentWorkspace?.id);
+  const navigate = useNavigate();
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false);
 
   // Auto-select first workspace if none selected
   useEffect(() => {
@@ -38,6 +51,99 @@ export default function Dashboard() {
       setCurrentWorkspace(workspaces[0]);
     }
   }, [workspaces, currentWorkspace, setCurrentWorkspace]);
+
+  const hasWorkspaces = Boolean(workspaces && workspaces.length > 0);
+
+  useEffect(() => {
+    if (hasWorkspaces) return;
+    const seenWizard = localStorage.getItem(WIZARD_STORAGE_KEY);
+    if (!seenWizard) {
+      const timer = setTimeout(() => setWizardOpen(true), 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [hasWorkspaces]);
+
+  const handleWizardDismiss = useCallback(() => {
+    setWizardOpen(false);
+    localStorage.setItem(WIZARD_STORAGE_KEY, "true");
+  }, []);
+
+  const handleCreateWorkspace = useCallback(() => {
+    setCreateWorkspaceOpen(true);
+  }, []);
+
+  const handleCreateTask = useCallback(() => {
+    navigate("/tasks");
+  }, [navigate]);
+
+  const handleInviteMember = useCallback(() => {
+    navigate("/settings?tab=team");
+  }, [navigate]);
+
+  const handleExploreViews = useCallback(() => {
+    navigate("/kanban");
+  }, [navigate]);
+
+  const handleSetupNotifications = useCallback(() => {
+    navigate("/settings?tab=notifications");
+  }, [navigate]);
+
+  const handleCompleteProfile = useCallback(() => {
+    navigate("/settings?tab=profile");
+  }, [navigate]);
+
+  const handleGoToFeatures = useCallback(() => {
+    navigate("/features");
+  }, [navigate]);
+
+  const handleWizardComplete = useCallback(
+    (data: OnboardingData) => {
+      localStorage.setItem(WIZARD_STORAGE_KEY, "true");
+      setWizardOpen(false);
+
+      if (!currentWorkspace) {
+        setCreateWorkspaceOpen(true);
+      }
+
+      switch (data.useCase) {
+        case "projects":
+          navigate("/kanban");
+          break;
+        case "team":
+          navigate("/dashboard");
+          break;
+        case "client":
+          navigate("/tasks");
+          break;
+        default:
+          break;
+      }
+    },
+    [currentWorkspace, navigate]
+  );
+
+  const handleOpenWizard = useCallback(() => {
+    setWizardOpen(true);
+  }, []);
+
+  const checklistActions = useMemo(
+    () => ({
+      "complete-profile": handleCompleteProfile,
+      "create-workspace": handleCreateWorkspace,
+      "create-task": handleCreateTask,
+      "invite-member": handleInviteMember,
+      "explore-views": handleExploreViews,
+      "setup-notifications": handleSetupNotifications,
+    }),
+    [
+      handleCompleteProfile,
+      handleCreateWorkspace,
+      handleCreateTask,
+      handleInviteMember,
+      handleExploreViews,
+      handleSetupNotifications,
+    ]
+  );
 
   const todoTasks = tasks?.filter((t) => t.status === "todo") || [];
   const inProgressTasks =
@@ -212,7 +318,18 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <main id="main-content" className="min-h-screen bg-slate-50">
+      <ProductTour />
+      <OnboardingWizard
+        open={wizardOpen}
+        onClose={handleWizardDismiss}
+        onComplete={handleWizardComplete}
+      />
+      <CreateWorkspaceDialog
+        open={createWorkspaceOpen}
+        onOpenChange={setCreateWorkspaceOpen}
+      />
+
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-indigo-100 via-white to-blue-50" />
         <div className="relative max-w-7xl mx-auto px-6 pt-16 pb-12">
@@ -242,16 +359,29 @@ export default function Dashboard() {
                     : "Tạo workspace đầu tiên để bắt đầu cộng tác và tổ chức công việc của bạn."}
                 </p>
                 <div className="mt-6 flex flex-wrap items-center gap-3">
-                  <Button className="cta-base cta-animated cta-primary px-6 py-2 text-sm">
+                  <Button
+                    className="cta-base cta-animated cta-primary px-6 py-2 text-sm"
+                    data-tour="create-task"
+                    onClick={handleCreateTask}
+                  >
                     <Plus className="h-4 w-4" />
                     Tạo công việc
                   </Button>
                   <Button
                     variant="outline"
                     className="cta-base cta-animated cta-outline-indigo px-6 py-2 text-sm"
+                    onClick={handleInviteMember}
                   >
                     <Users className="h-4 w-4" />
                     Mời thành viên
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="cta-base px-6 py-2 text-sm"
+                    onClick={handleOpenWizard}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Hướng dẫn nhanh
                   </Button>
                 </div>
               </div>
@@ -283,6 +413,7 @@ export default function Dashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 pb-16">
+        <OnboardingChecklist className="mb-8" actions={checklistActions} />
         {currentWorkspace ? (
           <>
             {/* Stats Cards */}
@@ -625,21 +756,19 @@ export default function Dashboard() {
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-16">
-                      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-8 rounded-2xl max-w-md mx-auto">
-                        <ListTodo className="h-16 w-16 mx-auto mb-4 text-gray-400" />
-                        <p className="text-gray-600 mb-6 text-lg font-medium">
-                          Chưa có công việc nào
-                        </p>
-                        <Button
-                          size="lg"
-                          className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
-                        >
-                          <Plus className="h-5 w-5 mr-2" />
-                          Tạo Công Việc Đầu Tiên
-                        </Button>
-                      </div>
-                    </div>
+                    <EmptyState
+                      icon={ListTodo}
+                      title="Chưa Có Công Việc Nào"
+                      description="Bắt đầu bằng cách tạo task đầu tiên để theo dõi công việc và tăng năng suất của bạn."
+                      action={{
+                        label: "Tạo Công Việc Đầu Tiên",
+                        onClick: () => {
+                          // TODO: Open create task modal
+                          console.log("Open create task modal");
+                        },
+                      }}
+                      className="py-12"
+                    />
                   )}
                 </CardContent>
               </Card>
@@ -683,42 +812,26 @@ export default function Dashboard() {
             )}
           </>
         ) : (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 shadow-2xl">
-              <CardHeader>
-                <div className="flex items-center">
-                  <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 rounded-2xl mr-4">
-                    <Users className="h-8 w-8 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-3xl">Bắt Đầu Ngay</CardTitle>
-                    <CardDescription className="text-base mt-1">
-                      Tạo workspace đầu tiên để bắt đầu quản lý công việc
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 mb-6 text-lg leading-relaxed">
-                  Workspace giúp bạn tổ chức các dự án khác nhau và cộng tác với
-                  các thành viên trong nhóm một cách hiệu quả.
-                </p>
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 h-12"
-                >
-                  <Plus className="h-5 w-5 mr-2" />
-                  Tạo Workspace
-                </Button>
-              </CardContent>
-            </Card>
-          </motion.div>
+          <EmptyState
+            icon={Users}
+            title="Chào Mừng Đến Với TaskFlow!"
+            description="Tạo workspace đầu tiên để bắt đầu quản lý công việc và cộng tác với nhóm của bạn một cách hiệu quả."
+            action={{
+              label: "Tạo Workspace",
+              onClick: handleCreateWorkspace,
+            }}
+            secondaryAction={{
+              label: "Tìm Hiểu Thêm",
+              onClick: handleGoToFeatures,
+            }}
+            illustration={
+              <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-8 rounded-2xl inline-block">
+                <Users className="h-24 w-24 text-indigo-400" />
+              </div>
+            }
+          />
         )}
       </div>
-    </div>
+    </main>
   );
 }
