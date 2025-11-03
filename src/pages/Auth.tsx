@@ -203,10 +203,10 @@ export default function AuthPage() {
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative hidden overflow-hidden bg-gradient-to-br from-indigo-600 via-blue-600 to-indigo-700 lg:flex lg:w-[45%]"
+        className="relative hidden overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-900 lg:flex lg:w-[45%]"
       >
         {/* Subtle pattern overlay */}
-        <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 opacity-[0.08]">
           <div
             className="absolute inset-0"
             style={{
@@ -218,19 +218,19 @@ export default function AuthPage() {
 
         {/* Accent shapes */}
         <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.1 }}
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 0.07 }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="absolute top-0 right-0 h-96 w-96 rounded-full bg-indigo-400 blur-3xl"
+          className="absolute top-[-8rem] right-[-6rem] h-[24rem] w-[24rem] rounded-full bg-indigo-500/80 blur-[140px]"
         />
         <motion.div
-          initial={{ scale: 0, opacity: 0 }}
-          animate={{ scale: 1, opacity: 0.1 }}
-          transition={{ duration: 1, delay: 0.4 }}
-          className="absolute bottom-0 left-0 h-80 w-80 rounded-full bg-blue-400 blur-3xl"
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 0.06 }}
+          transition={{ duration: 1, delay: 0.5 }}
+          className="absolute bottom-[-6rem] left-[-8rem] h-[22rem] w-[22rem] rounded-full bg-blue-500/60 blur-[140px]"
         />
 
-        <div className="relative z-10 flex flex-col justify-center pl-32 xl:pl-60 pr-16 py-12">
+        <div className="relative z-10 flex flex-col justify-center pl-28 pr-16 py-16 xl:pl-56">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -243,9 +243,9 @@ export default function AuthPage() {
                 whileHover={{ rotate: 360 }}
                 transition={{ duration: 0.6 }}
               >
-                <CheckCircle className="h-10 w-10 text-indigo-500" />
+                <CheckCircle className="h-10 w-10 text-indigo-400" />
               </motion.div>
-              <span className="text-3xl font-bold text-white group-hover:text-indigo-400 transition-colors">
+              <span className="text-3xl font-bold text-slate-100 group-hover:text-indigo-300 transition-colors">
                 TaskFlow
               </span>
             </Link>
@@ -254,18 +254,18 @@ export default function AuthPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.4 }}
-              className="text-4xl font-bold text-white mb-6 leading-tight"
+              className="text-4xl font-semibold text-white mb-6 leading-tight"
             >
               Quản lý công việc
               <br />
-              <span className="text-indigo-400">chuyên nghiệp</span>
+              <span className="text-indigo-300">chuyên nghiệp</span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="text-lg text-slate-300 mb-10 leading-relaxed"
+              className="text-base text-indigo-100/90 mb-8 leading-relaxed"
             >
               Nền tảng quản lý công việc được tin dùng bởi hơn 10,000 doanh
               nghiệp tại Việt Nam. Tăng năng suất, tối ưu quy trình làm việc.
@@ -291,11 +291,11 @@ export default function AuthPage() {
                 >
                   <motion.div
                     whileHover={{ scale: 1.1, rotate: 5 }}
-                    className="flex-shrink-0 w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/15 bg-white/5"
                   >
-                    <item.icon className="h-5 w-5 text-indigo-400" />
+                    <item.icon className="h-5 w-5 text-indigo-200" />
                   </motion.div>
-                  <span className="text-slate-300">{item.text}</span>
+                  <span className="text-indigo-100/90">{item.text}</span>
                 </motion.div>
               ))}
             </motion.div>
@@ -304,20 +304,20 @@ export default function AuthPage() {
       </motion.div>
 
       {/* Right Side - Form */}
-      <div className="relative flex flex-1 items-center justify-center p-6 md:p-10">
+      <div className="relative flex flex-1 items-center justify-center bg-slate-50 p-6 md:p-12">
         {/* Background overlay for form area */}
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 0.9 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="absolute inset-0 bg-white/90 backdrop-blur-sm"
+          className="absolute inset-0 bg-white"
         />
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="relative z-10 w-full max-w-[500px]"
+          className="relative z-10 w-full max-w-[520px]"
         >
           {/* Mobile Logo */}
           <Link
@@ -336,7 +336,7 @@ export default function AuthPage() {
               animate="visible"
               exit="hidden"
             >
-              <Card className="border-0 shadow-2xl bg-white overflow-hidden">
+              <Card className="overflow-hidden border border-slate-200/70 bg-white shadow-xl">
                 <CardHeader className="space-y-1 pb-6">
                   <motion.div variants={itemVariants}>
                     <CardTitle className="text-2xl font-bold text-slate-900 tracking-tight">
@@ -680,7 +680,7 @@ export default function AuthPage() {
                       >
                         <Button
                           type="submit"
-                          className="cta-base cta-animated cta-primary w-full h-11 justify-center text-sm"
+                          className="w-full h-12 justify-center rounded-xl bg-indigo-600 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:bg-indigo-700 hover:shadow-xl focus-visible:ring-2 focus-visible:ring-indigo-300"
                           disabled={loading}
                           tabIndex={0}
                         >
@@ -728,10 +728,10 @@ export default function AuthPage() {
                         >
                           <Button
                             type="button"
-                          variant="outline"
+                            variant="outline"
                             onClick={handleGoogleSignIn}
                             disabled={loading}
-                          className="cta-base w-full h-11 justify-center gap-2 border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md"
+                            className="w-full h-11 justify-center gap-2 rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md"
                             tabIndex={0}
                           >
                             <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
@@ -765,11 +765,11 @@ export default function AuthPage() {
                             variant="outline"
                             onClick={handleGithubSignIn}
                             disabled={loading}
-                          className="cta-base w-full h-11 justify-center gap-2 border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md"
+                            className="w-full h-11 justify-center gap-2 rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md"
                             tabIndex={0}
                           >
                             <svg
-                            className="mr-2 h-5 w-5"
+                              className="mr-2 h-5 w-5"
                               fill="currentColor"
                               viewBox="0 0 24 24"
                             >

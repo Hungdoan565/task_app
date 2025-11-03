@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -134,8 +135,11 @@ export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    company: "",
+    phone: "",
     subject: "Câu Hỏi Chung",
     message: "",
+    consent: true,
   });
   const [formMessage, setFormMessage] = useState<
     { type: "success" | "error"; text: string }
@@ -155,12 +159,27 @@ export default function ContactPage() {
     setLoading(true);
 
     try {
+      const baseMessage = formData.message.trim();
+      const supplementalDetails = [
+        formData.company && `Công ty: ${formData.company}`,
+        formData.phone && `Điện thoại: ${formData.phone}`,
+        `Cho phép liên hệ qua điện thoại/Zalo: ${formData.consent ? "Có" : "Không"}`,
+      ].filter(Boolean) as string[];
+
+      const messagePayload = supplementalDetails.length
+        ? `${baseMessage}
+
+---
+Thông tin bổ sung:
+${supplementalDetails.join("\n")}`
+        : baseMessage;
+
       const { error } = await supabase.from("contact_messages").insert([
         {
           name: formData.name,
           email: formData.email,
           subject: formData.subject,
-          message: formData.message,
+          message: messagePayload,
         },
       ]);
 
@@ -179,8 +198,11 @@ export default function ContactPage() {
       setFormData({
         name: "",
         email: "",
+        company: "",
+        phone: "",
         subject: "Câu Hỏi Chung",
         message: "",
+        consent: true,
       });
     } catch (error) {
       toast({
@@ -284,7 +306,7 @@ export default function ContactPage() {
           </section>
 
           <section className="px-4 py-section-md">
-            <div className="mx-auto grid max-w-container-lg gap-10 lg:grid-cols-[1.7fr,1fr]">
+            <div className="mx-auto grid max-w-container-lg gap-10 lg:grid-cols-[1.55fr,1fr]">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -349,7 +371,7 @@ export default function ContactPage() {
                           onChange={(event) =>
                             setFormData({ ...formData, name: event.target.value })
                           }
-                          className="mt-2 h-12 rounded-xl border-border/60 text-base"
+                          className="mt-2 h-12 rounded-xl border border-border/60 bg-white/80 px-4 text-base transition-all duration-200 focus-visible:border-indigo-400 focus-visible:ring-2 focus-visible:ring-indigo-200/80 focus-visible:ring-offset-1 focus-visible:ring-offset-white"
                         />
                       </div>
 
@@ -366,7 +388,42 @@ export default function ContactPage() {
                           onChange={(event) =>
                             setFormData({ ...formData, email: event.target.value })
                           }
-                          className="mt-2 h-12 rounded-xl border-border/60 text-base"
+                          className="mt-2 h-12 rounded-xl border border-border/60 bg-white/80 px-4 text-base transition-all duration-200 focus-visible:border-indigo-400 focus-visible:ring-2 focus-visible:ring-indigo-200/80 focus-visible:ring-offset-1 focus-visible:ring-offset-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <div>
+                        <Label htmlFor="company" className="text-sm font-semibold text-gray-900">
+                          Công ty (tuỳ chọn)
+                        </Label>
+                        <Input
+                          id="company"
+                          type="text"
+                          placeholder="Tên công ty hoặc đội nhóm"
+                          value={formData.company}
+                          onChange={(event) =>
+                            setFormData({ ...formData, company: event.target.value })
+                          }
+                          className="mt-2 h-12 rounded-xl border border-border/60 bg-white/80 px-4 text-base transition-all duration-200 focus-visible:border-indigo-400 focus-visible:ring-2 focus-visible:ring-indigo-200/80 focus-visible:ring-offset-1 focus-visible:ring-offset-white"
+                        />
+                      </div>
+
+                      <div>
+                        <Label htmlFor="phone" className="text-sm font-semibold text-gray-900">
+                          Số điện thoại (tuỳ chọn)
+                        </Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          inputMode="tel"
+                          placeholder="Ví dụ: 0981 234 567"
+                          value={formData.phone}
+                          onChange={(event) =>
+                            setFormData({ ...formData, phone: event.target.value })
+                          }
+                          className="mt-2 h-12 rounded-xl border border-border/60 bg-white/80 px-4 text-base transition-all duration-200 focus-visible:border-indigo-400 focus-visible:ring-2 focus-visible:ring-indigo-200/80 focus-visible:ring-offset-1 focus-visible:ring-offset-white"
                         />
                       </div>
                     </div>
@@ -377,19 +434,15 @@ export default function ContactPage() {
                       </Label>
                       <Select
                         value={formData.subject}
-                        onValueChange={(value) =>
-                          setFormData({ ...formData, subject: value })
-                        }
+                        onValueChange={(value) => setFormData({ ...formData, subject: value })}
                       >
-                        <SelectTrigger className="mt-2 h-12 rounded-xl border-border/60 text-base">
+                        <SelectTrigger className="mt-2 h-12 rounded-xl border border-border/60 bg-white/80 text-base transition-all duration-200 focus-visible:border-indigo-400 focus-visible:ring-2 focus-visible:ring-indigo-200/80 focus-visible:ring-offset-1 focus-visible:ring-offset-white">
                           <SelectValue placeholder="Chủ đề bạn quan tâm" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Câu Hỏi Chung">Câu Hỏi Chung</SelectItem>
                           <SelectItem value="Hỗ Trợ Kỹ Thuật">Hỗ Trợ Kỹ Thuật</SelectItem>
-                          <SelectItem value="Đề Xuất Tính Năng">
-                            Đề Xuất Tính Năng
-                          </SelectItem>
+                          <SelectItem value="Đề Xuất Tính Năng">Đề Xuất Tính Năng</SelectItem>
                           <SelectItem value="Báo Lỗi">Báo Lỗi</SelectItem>
                           <SelectItem value="Hợp Tác">Hợp Tác</SelectItem>
                           <SelectItem value="Khác">Khác</SelectItem>
@@ -413,8 +466,21 @@ export default function ContactPage() {
                             message: event.target.value,
                           })
                         }
-                        className="mt-2 rounded-xl border-border/60 text-base"
+                        className="mt-2 min-h-[160px] rounded-xl border border-border/60 bg-white/80 text-base transition-all duration-200 focus-visible:border-indigo-400 focus-visible:ring-2 focus-visible:ring-indigo-200/80 focus-visible:ring-offset-1 focus-visible:ring-offset-white"
                       />
+                    </div>
+
+                    <div className="flex items-start gap-3 rounded-2xl border border-border/60 bg-white/70 p-4">
+                      <Checkbox
+                        id="consent"
+                        checked={formData.consent}
+                        onCheckedChange={(checked) =>
+                          setFormData({ ...formData, consent: checked === true })
+                        }
+                      />
+                      <label htmlFor="consent" className="text-sm text-muted-foreground leading-relaxed">
+                        Cho phép TaskFlow liên hệ với tôi qua điện thoại hoặc Zalo nếu cần thêm thông tin.
+                      </label>
                     </div>
 
                     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -447,7 +513,7 @@ export default function ContactPage() {
               </motion.div>
 
               <motion.aside
-                className="space-y-6"
+                className="space-y-6 lg:sticky lg:top-28"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -462,14 +528,23 @@ export default function ContactPage() {
                   </p>
                   <div className="mt-6 space-y-4">
                     {contactInfo.map((info) => (
-                      <div key={info.title} className="flex gap-4 rounded-2xl border border-border/40 bg-white/70 p-4">
-                        <span className={`rounded-xl bg-gradient-to-r ${info.gradient} p-3 text-white shadow-lg`}>
-                          <info.icon className="h-5 w-5" />
+                      <div
+                        key={info.title}
+                        className="flex items-start gap-4 rounded-2xl border border-border/40 bg-white/80 p-5 shadow-sm transition-colors duration-200 hover:border-indigo-200"
+                      >
+                        <span
+                          className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-r ${info.gradient} text-white shadow-md`}
+                        >
+                          <info.icon className="h-6 w-6" />
                         </span>
                         <div className="space-y-1 text-sm text-muted-foreground">
-                          <p className="font-semibold text-gray-900">{info.title}</p>
+                          <p className="text-base font-semibold text-gray-900">
+                            {info.title}
+                          </p>
                           {info.details.map((detail) => (
-                            <p key={detail}>{detail}</p>
+                            <p key={detail} className="leading-relaxed">
+                              {detail}
+                            </p>
                           ))}
                         </div>
                       </div>
@@ -478,40 +553,79 @@ export default function ContactPage() {
                 </Card>
 
                 <Card className="rounded-3xl border border-border/60 bg-white/80 p-8 shadow-md backdrop-blur">
-                  <h3 className="text-heading-sm font-semibold text-gray-900">
-                    Các kênh ưu tiên
-                  </h3>
-                  <div className="mt-5 space-y-4">
-                    {supportChannels.map((channel) => (
-                      <div
-                        key={channel.title}
-                        className="group flex items-start gap-4 rounded-2xl border border-border/50 bg-white/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-lg"
-                      >
-                        <span className="rounded-xl bg-indigo-100 p-3 text-indigo-600">
-                          <channel.icon className="h-5 w-5" />
-                        </span>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <p className="text-sm font-semibold text-gray-900">
-                              {channel.title}
-                            </p>
-                            {channel.badge && (
-                              <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[11px] font-semibold uppercase text-indigo-600">
-                                {channel.badge}
-                              </span>
-                            )}
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-heading-sm font-semibold text-gray-900">
+                        Các kênh ưu tiên
+                      </h3>
+                      <div className="mt-5 space-y-4">
+                        {supportChannels.map((channel) => (
+                          <div
+                            key={channel.title}
+                            className="group flex items-start gap-4 rounded-2xl border border-border/50 bg-white/70 p-4 transition-all duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-lg"
+                          >
+                            <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600">
+                              <channel.icon className="h-5 w-5" />
+                            </span>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <p className="text-sm font-semibold text-gray-900">
+                                  {channel.title}
+                                </p>
+                                {channel.badge && (
+                                  <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[11px] font-semibold uppercase text-indigo-600">
+                                    {channel.badge}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                                {channel.description}
+                              </p>
+                            </div>
+                            <ArrowUpRight className="mt-1 h-4 w-4 text-indigo-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
                           </div>
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            {channel.description}
-                          </p>
-                        </div>
-                        <ArrowUpRight className="mt-1 h-4 w-4 text-indigo-400 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
+                        ))}
                       </div>
-                    ))}
+                    </div>
+
+                    <div className="border-t border-border/40 pt-4">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500">
+                        Tài nguyên nhanh
+                      </p>
+                      <div className="mt-4 space-y-3">
+                        {quickLinks.map((link) => {
+                          const content = (
+                            <span className="flex w-full items-center justify-between">
+                              <span>{link.label}</span>
+                              <ArrowUpRight className="h-4 w-4" />
+                            </span>
+                          );
+
+                          return "to" in link ? (
+                            <Link
+                              key={link.label}
+                              to={link.to}
+                              className="flex items-center justify-between rounded-2xl border border-border/50 bg-white/70 px-4 py-3 text-sm font-semibold text-foreground transition-all duration-200 hover:border-indigo-200 hover:bg-indigo-50"
+                            >
+                              {content}
+                            </Link>
+                          ) : (
+                            <a
+                              key={link.label}
+                              href={link.href}
+                              className="flex items-center justify-between rounded-2xl border border-border/50 bg-white/70 px-4 py-3 text-sm font-semibold text-foreground transition-all duration-200 hover:border-indigo-200 hover:bg-indigo-50"
+                              rel="noopener noreferrer"
+                            >
+                              {content}
+                            </a>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 </Card>
 
-                <div className="rounded-3xl bg-gradient-to-br from-indigo-600 via-blue-600 to-sky-500 p-8 text-white shadow-xl">
+                <div className="rounded-3xl bg-gradient-to-br from-indigo-600 via-blue-600 to-sky-500 p-6 text-white shadow-xl">
                   <h3 className="text-2xl font-semibold">Cần trao đổi trực tiếp?</h3>
                   <p className="mt-2 text-sm text-white/80">
                     Đặt lịch tư vấn miễn phí với chuyên gia của TaskFlow để nhận lộ trình triển khai phù hợp nhất.
@@ -523,40 +637,10 @@ export default function ContactPage() {
                     </a>
                   </Button>
                 </div>
-
-                <Card className="rounded-3xl border border-border/60 bg-white/80 p-8 shadow-md backdrop-blur">
-                  <h3 className="text-heading-sm font-semibold text-gray-900">
-                    Tài nguyên nhanh
-                  </h3>
-                  <div className="mt-4 space-y-3">
-                    {quickLinks.map((link) => (
-                      <Button
-                        key={link.label}
-                        variant="outline"
-                        className="cta-base w-full justify-between rounded-xl border border-border/60 bg-white/70 px-4 py-3 text-sm font-semibold text-foreground hover:border-indigo-200 hover:bg-indigo-50"
-                        asChild
-                      >
-                        {"to" in link ? (
-                          <Link to={link.to}>
-                            <span>{link.label}</span>
-                            <ArrowUpRight className="h-4 w-4" />
-                          </Link>
-                        ) : (
-                          <a href={link.href} rel="noopener noreferrer">
-                            <span>{link.label}</span>
-                            <ArrowUpRight className="h-4 w-4" />
-                          </a>
-                        )}
-                      </Button>
-                    ))}
-                  </div>
-                </Card>
               </motion.aside>
             </div>
-          </section>
 
-          <section className="px-4 py-section-md">
-            <div className="mx-auto max-w-container-md text-center">
+            <div className="mx-auto mt-16 max-w-container-md text-center">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -570,13 +654,12 @@ export default function ContactPage() {
                   Thông tin bạn cần chỉ cách một cú nhấp
                 </h2>
                 <p className="mt-3 text-sm md:text-base text-muted-foreground">
-                  Chọn chủ đề để tìm câu trả lời nhanh hoặc liên hệ trực tiếp nếu
-                  bạn cần hỗ trợ chuyên sâu hơn.
+                  Chọn chủ đề để tìm câu trả lời nhanh hoặc liên hệ trực tiếp nếu bạn cần hỗ trợ chuyên sâu hơn.
                 </p>
               </motion.div>
             </div>
 
-            <div className="mx-auto mt-12 max-w-container-md space-y-6">
+            <div className="mx-auto mt-10 max-w-container-md space-y-6">
               {faqs.map((faq, index) => (
                 <motion.div
                   key={faq.question}
@@ -603,6 +686,7 @@ export default function ContactPage() {
                 </motion.div>
               ))}
             </div>
+
           </section>
         </main>
 
