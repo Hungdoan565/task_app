@@ -1,7 +1,11 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useLayoutEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { usePageTracking } from "./hooks/usePageTracking";
+import SkipLink from "./components/ui/skip-link";
 
 // Pages
 import Landing from "./pages/Landing";
@@ -14,6 +18,27 @@ import Pricing from "./pages/Pricing";
 import AIDevelopment from "./pages/AIDevelopment";
 import Enterprise from "./pages/Enterprise";
 import Dashboard from "./pages/Dashboard";
+import NotFound from "./pages/NotFound";
+
+function ScrollToTop() {
+    const { pathname } = useLocation();
+  
+    useLayoutEffect(() => {
+      const html = document.documentElement;
+      const prev = html.style.scrollBehavior;
+  
+      html.style.scrollBehavior = "auto";
+      window.scrollTo(0, 0);
+      html.style.scrollBehavior = prev;
+    }, [pathname]);
+  
+    return null;
+  }
+
+function PageTracking() {
+  usePageTracking();
+  return null;
+}
 
 // Create a client
 const queryClient = new QueryClient({
@@ -28,10 +53,20 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
+<<<<<<< HEAD
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <Router>
         <Routes>
+=======
+    <ErrorBoundary>
+      <HelmetProvider>
+        <Router>
+          <SkipLink />
+          <ScrollToTop />
+          <PageTracking />
+          <Routes>
+>>>>>>> 34510a4c28b0244503a9f36970b9e198898768b9
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />
@@ -55,12 +90,13 @@ function App() {
             }
           />
 
-          {/* Catch all - redirect to home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* 404 Not Found */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
         </Router>
       </QueryClientProvider>
     </HelmetProvider>
+    </ErrorBoundary>
   );
 }
 

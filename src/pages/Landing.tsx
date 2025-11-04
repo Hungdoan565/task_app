@@ -1,3 +1,5 @@
+import { useCallback } from "react";
+import type { MouseEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -14,7 +16,7 @@ import {
   Bell,
   Lock,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import CountUp from "react-countup";
@@ -60,6 +62,34 @@ const StatCounter = ({
 };
 
 export default function LandingPage() {
+  const navigate = useNavigate();
+
+  const handleFooterLink = useCallback(
+    (event: MouseEvent<HTMLAnchorElement>, path: string) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.shiftKey
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const html = document.documentElement;
+      const previousBehavior = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
+      window.scrollTo(0, 0);
+      html.style.scrollBehavior = previousBehavior;
+
+      navigate(path);
+    },
+    [navigate]
+  );
+
   const features = [
     {
       icon: Target,
@@ -170,6 +200,8 @@ export default function LandingPage() {
 
       <div className="min-h-screen bg-white">
         <NavigationBar />
+
+        <main id="main-content">
 
         {/* Hero Section */}
         <section className="relative pt-20 md:pt-32 pb-16 md:pb-24 px-4 overflow-hidden bg-gradient-to-br from-slate-50 via-white to-indigo-50">
@@ -327,6 +359,47 @@ export default function LandingPage() {
                 </div>
               </motion.div>
             </div>
+          </div>
+        </section>
+
+        {/* Trusted By Logos Section */}
+        <section className="py-12 bg-white border-b border-slate-200">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center"
+            >
+              <p className="text-sm font-semibold text-slate-500 mb-8 uppercase tracking-wider">
+                Được tin dùng bởi các đội nhóm hàng đầu
+              </p>
+              
+              <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8 max-w-5xl mx-auto opacity-60">
+                {/* Logo placeholders - replace with actual logos later */}
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg" />
+                  <span className="font-bold text-xl text-slate-700">TechCorp</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg" />
+                  <span className="font-bold text-xl text-slate-700">StartupInc</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg" />
+                  <span className="font-bold text-xl text-slate-700">DevTeam</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg" />
+                  <span className="font-bold text-xl text-slate-700">Agency+</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-lg" />
+                  <span className="font-bold text-xl text-slate-700">DesignHub</span>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </section>
 
@@ -633,6 +706,7 @@ export default function LandingPage() {
                     <Link
                       to="/features"
                       className="hover:text-indigo-400 transition-colors"
+                      onClick={(event) => handleFooterLink(event, "/features")}
                     >
                       Tính Năng
                     </Link>
@@ -641,6 +715,7 @@ export default function LandingPage() {
                     <Link
                       to="/downloads"
                       className="hover:text-indigo-400 transition-colors"
+                      onClick={(event) => handleFooterLink(event, "/downloads")}
                     >
                       Downloads
                     </Link>
@@ -649,6 +724,7 @@ export default function LandingPage() {
                     <Link
                       to="/pricing"
                       className="hover:text-indigo-400 transition-colors"
+                      onClick={(event) => handleFooterLink(event, "/pricing")}
                     >
                       Pricing
                     </Link>
@@ -666,6 +742,7 @@ export default function LandingPage() {
                     <Link
                       to="/ai-development"
                       className="hover:text-indigo-400 transition-colors"
+                      onClick={(event) => handleFooterLink(event, "/ai-development")}
                     >
                       AI Development
                     </Link>
@@ -674,6 +751,7 @@ export default function LandingPage() {
                     <Link
                       to="/enterprise"
                       className="hover:text-indigo-400 transition-colors"
+                      onClick={(event) => handleFooterLink(event, "/enterprise")}
                     >
                       Enterprise
                     </Link>
@@ -682,6 +760,7 @@ export default function LandingPage() {
                     <Link
                       to="/about"
                       className="hover:text-indigo-400 transition-colors"
+                      onClick={(event) => handleFooterLink(event, "/about")}
                     >
                       Về Chúng Tôi
                     </Link>
@@ -699,6 +778,7 @@ export default function LandingPage() {
                     <Link
                       to="/contact"
                       className="hover:text-indigo-400 transition-colors"
+                      onClick={(event) => handleFooterLink(event, "/contact")}
                     >
                       Liên Hệ
                     </Link>
@@ -707,6 +787,7 @@ export default function LandingPage() {
                     <Link
                       to="/dashboard"
                       className="hover:text-indigo-400 transition-colors"
+                      onClick={(event) => handleFooterLink(event, "/dashboard")}
                     >
                       Dashboard
                     </Link>
@@ -731,6 +812,7 @@ export default function LandingPage() {
             </div>
           </div>
         </footer>
+        </main>
       </div>
     </>
   );

@@ -124,7 +124,7 @@ export default function DownloadsPage() {
       <div className="min-h-screen bg-gradient-to-b from-white via-indigo-50/40 to-white text-foreground">
         <NavigationBar />
 
-        <main className="pt-32">
+        <main id="main-content" className="pt-32">
           <nav className="sticky top-20 z-40 hidden w-full justify-center px-4 md:flex">
             <div className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white/90 px-3 py-2 shadow-lg backdrop-blur">
               <Navigation className="h-4 w-4 text-indigo-500" />

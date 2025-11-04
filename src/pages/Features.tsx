@@ -1,3 +1,5 @@
+import { useCallback } from "react";
+import type { MouseEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -19,12 +21,42 @@ import {
   Clock,
   Globe,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import NavigationBar from "@/components/layout/NavigationBar";
 import SEO from "@/components/SEO";
+import CompetitorTable from "@/components/comparison/CompetitorTable";
+import FeatureScreenshot from "@/components/features/FeatureScreenshot";
 
 export default function FeaturesPage() {
+  const navigate = useNavigate();
+
+  const handleFooterLink = useCallback(
+    (event: MouseEvent<HTMLAnchorElement>, path: string) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.shiftKey
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const html = document.documentElement;
+      const previousBehavior = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
+      window.scrollTo(0, 0);
+      html.style.scrollBehavior = previousBehavior;
+
+      navigate(path);
+    },
+    [navigate]
+  );
+
   const mainFeatures = [
     {
       icon: Layout,
@@ -39,6 +71,7 @@ export default function FeaturesPage() {
       ],
       useCase: "Hoàn hảo cho quản lý dự án Agile",
       iconColor: "bg-indigo-100 text-indigo-600",
+      screenshotVariant: "kanban" as const,
     },
     {
       icon: Calendar,
@@ -53,6 +86,7 @@ export default function FeaturesPage() {
       ],
       useCase: "Lý tưởng cho công việc có deadline",
       iconColor: "bg-blue-100 text-blue-600",
+      screenshotVariant: "calendar" as const,
     },
     {
       icon: Users,
@@ -67,6 +101,7 @@ export default function FeaturesPage() {
       ],
       useCase: "Được xây dựng cho nhóm từ xa",
       iconColor: "bg-purple-100 text-purple-600",
+      screenshotVariant: "dashboard" as const,
     },
     {
       icon: Type,
@@ -191,6 +226,8 @@ export default function FeaturesPage() {
 
       <div className="min-h-screen bg-white">
         <NavigationBar />
+
+        <main id="main-content">
 
         {/* Hero Section */}
         <section className="relative pt-20 md:pt-32 pb-16 md:pb-24 px-4 overflow-hidden bg-gradient-to-br from-slate-50 via-white to-indigo-50">
@@ -355,34 +392,161 @@ export default function FeaturesPage() {
                     </div>
                   </div>
 
-                  {/* Visual Mockup */}
+                  {/* Feature Screenshot */}
                   <div
                     className={
                       idx % 2 === 1 ? "md:col-start-1 md:row-start-1" : ""
                     }
                   >
-                    <motion.div
-                      whileHover={{ y: -8 }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <Card className="p-6 md:p-8 bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 shadow-lg hover:shadow-xl transition-all duration-300">
-                        <div className="aspect-video bg-white rounded-lg flex items-center justify-center border border-slate-200">
-                          <div className="text-center p-6">
-                            <feature.icon className="h-16 w-16 mx-auto mb-4 text-slate-400" />
-                            <p className="text-slate-600 font-semibold mb-2">
-                              {feature.title}
-                            </p>
-                            <p className="text-slate-400 text-sm">
-                              Demo coming soon
-                            </p>
-                          </div>
-                        </div>
-                      </Card>
-                    </motion.div>
+                    <FeatureScreenshot
+                      icon={feature.icon}
+                      title={feature.title}
+                      variant={feature.screenshotVariant}
+                    />
                   </div>
                 </motion.div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Use Cases by Industry */}
+        <section className="py-16 md:py-24 px-4 bg-gradient-to-br from-indigo-50 via-white to-blue-50">
+          <div className="container mx-auto max-w-7xl">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-12 md:mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">
+                Giải Pháp Cho Mọi Ngành
+              </h2>
+              <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto">
+                TaskFlow được tin dùng bởi các đội nhóm từ nhiều lĩnh vực khác nhau
+              </p>
+            </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[
+                {
+                  icon: "💻",
+                  industry: "Công Nghệ & Phần Mềm",
+                  description: "Quản lý sprint, theo dõi bugs, và phối hợp với đội phát triển.",
+                  benefits: [
+                    "Agile/Scrum workflows",
+                    "Git integration",
+                    "Bug tracking",
+                    "Code review tracking"
+                  ]
+                },
+                {
+                  icon: "🎨",
+                  industry: "Design & Sáng Tạo",
+                  description: "Theo dõi dự án thiết kế, quản lý feedback và asset.",
+                  benefits: [
+                    "Design review workflow",
+                    "Asset management",
+                    "Client feedback",
+                    "Version control"
+                  ]
+                },
+                {
+                  icon: "📱",
+                  industry: "Marketing & Agency",
+                  description: "Lên kế hoạch campaign, quản lý nội dung và deadline.",
+                  benefits: [
+                    "Campaign planning",
+                    "Content calendar",
+                    "Client management",
+                    "Performance tracking"
+                  ]
+                },
+                {
+                  icon: "🏢",
+                  industry: "Doanh Nghiệp",
+                  description: "Quản lý dự án lớn, phối hợp nhiều phòng ban.",
+                  benefits: [
+                    "Multi-department collaboration",
+                    "Advanced permissions",
+                    "Custom workflows",
+                    "Enterprise reporting"
+                  ]
+                },
+                {
+                  icon: "🎓",
+                  industry: "Giáo Dục",
+                  description: "Tổ chức bài giảng, theo dõi tiến độ sinh viên.",
+                  benefits: [
+                    "Course planning",
+                    "Assignment tracking",
+                    "Student collaboration",
+                    "Grade management"
+                  ]
+                },
+                {
+                  icon: "🏗️",
+                  industry: "Xây Dựng & Sản Xuất",
+                  description: "Theo dõi dự án, quản lý nguồn lực và timeline.",
+                  benefits: [
+                    "Project timeline",
+                    "Resource allocation",
+                    "Milestone tracking",
+                    "Vendor management"
+                  ]
+                }
+              ].map((useCase, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                >
+                  <Card className="p-8 h-full bg-white border border-slate-200 shadow-lg hover:shadow-2xl transition-all duration-300">
+                    <div className="text-5xl mb-4">{useCase.icon}</div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-3">
+                      {useCase.industry}
+                    </h3>
+                    <p className="text-slate-600 mb-6 leading-relaxed">
+                      {useCase.description}
+                    </p>
+                    <div className="space-y-2">
+                      {useCase.benefits.map((benefit, bidx) => (
+                        <div key={bidx} className="flex items-start gap-2">
+                          <Check className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
+                          <span className="text-sm text-slate-700">{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="text-center mt-12"
+            >
+              <p className="text-slate-600 mb-6">
+                Không thấy ngành của bạn? TaskFlow linh hoạt cho mọi loại hình công việc
+              </p>
+              <Link to="/contact">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-2 border-indigo-600 hover:bg-indigo-50 text-indigo-600 font-semibold"
+                >
+                  Tư Vấn Giải Pháp Riêng
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+            </motion.div>
           </div>
         </section>
 
@@ -432,6 +596,13 @@ export default function FeaturesPage() {
                 </motion.div>
               ))}
             </motion.div>
+          </div>
+        </section>
+
+        {/* Competitor Comparison */}
+        <section className="py-16 md:py-24 px-4 bg-white">
+          <div className="container mx-auto max-w-6xl">
+            <CompetitorTable />
           </div>
         </section>
 
@@ -502,6 +673,8 @@ export default function FeaturesPage() {
           </div>
         </section>
 
+        </main>
+
         {/* Footer */}
         <footer className="bg-slate-900 text-slate-300 py-12 md:py-16">
           <div className="container mx-auto px-4">
@@ -529,6 +702,7 @@ export default function FeaturesPage() {
                     <Link
                       to="/features"
                       className="hover:text-indigo-400 transition-colors"
+                      onClick={(event) => handleFooterLink(event, "/features")}
                     >
                       Tính Năng
                     </Link>
@@ -537,6 +711,7 @@ export default function FeaturesPage() {
                     <Link
                       to="/about"
                       className="hover:text-indigo-400 transition-colors"
+                      onClick={(event) => handleFooterLink(event, "/about")}
                     >
                       Về Chúng Tôi
                     </Link>
@@ -545,6 +720,7 @@ export default function FeaturesPage() {
                     <Link
                       to="/dashboard"
                       className="hover:text-indigo-400 transition-colors"
+                      onClick={(event) => handleFooterLink(event, "/dashboard")}
                     >
                       Dashboard
                     </Link>
@@ -562,6 +738,7 @@ export default function FeaturesPage() {
                     <Link
                       to="/contact"
                       className="hover:text-indigo-400 transition-colors"
+                      onClick={(event) => handleFooterLink(event, "/contact")}
                     >
                       Liên Hệ
                     </Link>

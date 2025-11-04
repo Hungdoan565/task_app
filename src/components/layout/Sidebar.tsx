@@ -24,7 +24,7 @@ export default function Sidebar() {
     <aside className="fixed left-0 top-16 bottom-0 w-64 bg-white border-r overflow-y-auto hidden md:block">
       <div className="p-4 space-y-6">
         {/* Workspace Selector */}
-        <div>
+        <div data-tour="workspace-selector" tabIndex={-1} aria-label="Workspace selector">
           <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
             Workspace
           </h3>
@@ -49,7 +49,12 @@ export default function Sidebar() {
 
         {/* Navigation */}
         {currentWorkspace && (
-          <nav className="space-y-1">
+          <nav
+            className="space-y-1"
+            data-tour="navigation"
+            tabIndex={-1}
+            aria-label="Workspace navigation"
+          >
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
               Navigation
             </h3>
