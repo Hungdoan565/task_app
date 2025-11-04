@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
 // Pages
@@ -14,10 +15,22 @@ import AIDevelopment from "./pages/AIDevelopment";
 import Enterprise from "./pages/Enterprise";
 import Dashboard from "./pages/Dashboard";
 
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
+
 function App() {
   return (
     <HelmetProvider>
-      <Router>
+      <QueryClientProvider client={queryClient}>
+        <Router>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Landing />} />
@@ -45,7 +58,8 @@ function App() {
           {/* Catch all - redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Router>
+        </Router>
+      </QueryClientProvider>
     </HelmetProvider>
   );
 }
