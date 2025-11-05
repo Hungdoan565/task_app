@@ -53,6 +53,21 @@ VITE_SUPABASE_ANON_KEY=your_anon_key_here
 - Click "Run"
 - You should see: "Success. No rows returned"
 
+### Migration 4: Contact Messages
+- Open `supabase/migrations/004_contact_messages.sql`
+- Copy the entire content
+- Paste into the SQL Editor
+- Click "Run"
+- You should see: "Success. No rows returned"
+
+### Migration 5: Dual Dashboard Foundation
+- Open `supabase/migrations/005_dual_dashboard_foundation.sql`
+- Copy the entire content (it's lengthy—ensure everything is selected)
+- Paste into the SQL Editor
+- Click "Run"
+- You should see: "Success. No rows returned"
+- This migration adds the workspace permissions matrix, hierarchical folders, helper functions, and the latest RLS policies.
+
 ## Step 4: Configure Authentication
 
 ### Enable Email Authentication
@@ -111,6 +126,11 @@ You should see:
 - tasks
 - comments
 - attachments
+- workspace_folders
+- workspace_role_permissions
+- workspace_role_permissions_global
+- workspace_member_permissions
+- contact_messages
 
 ### Test Authentication
 1. In your app, try to sign up with email
@@ -129,15 +149,7 @@ Since you're the first user, you'll need to manually create a workspace:
    - **name**: "My Workspace"
    - **owner_id**: Your user ID (get from profiles table)
 4. Click "Save"
-5. Copy the workspace ID
-
-6. Go to **workspace_members** table
-7. Click "Insert row"
-8. Fill in:
-   - **workspace_id**: The ID from step 5
-   - **user_id**: Your user ID
-   - **role**: owner
-9. Click "Save"
+5. The owner will be automatically added to `workspace_members` with the `owner` role (trigger from migration 005). Verify the row exists and adjust roles for other teammates as needed.
 
 ## Troubleshooting
 

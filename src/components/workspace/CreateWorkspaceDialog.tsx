@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
 import { useWorkspaces } from '@/hooks/useWorkspaces'
+import { useStore } from '@/store/useStore'
 
 interface CreateWorkspaceDialogProps {
   open: boolean
@@ -24,14 +25,20 @@ export default function CreateWorkspaceDialog({
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const { createWorkspace } = useWorkspaces()
+  const { setCurrentWorkspace, setCurrentFolder } = useStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    await createWorkspace.mutateAsync({
+    const workspace = await createWorkspace.mutateAsync({
       name,
       description,
     })
+
+    if (workspace) {
+      setCurrentWorkspace(workspace)
+      setCurrentFolder(null)
+    }
 
     setName('')
     setDescription('')

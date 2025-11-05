@@ -1,7 +1,58 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
 import { supabase } from '@/lib/supabase'
-import { Workspace } from '@/types'
+import type { Workspace, WorkspaceMember } from '@/types'
 import { toast } from '@/hooks/use-toast'
+
+const slugify = (input: string) => {
+  const base = input
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+
+  return base || `workspace-${Math.random().toString(36).slice(2, 8)}`
+}
+
+const mapWorkspaceMember = (member: any): WorkspaceMember => ({
+  workspace_id: member.workspace_id,
+  user_id: member.user_id,
+  role: member.role ?? 'member',
+  permissions: member.permissions ?? {},
+  joined_at: member.joined_at ?? new Date().toISOString(),
+  invited_by: member.invited_by ?? null,
+  last_active_at: member.last_active_at ?? null,
+  user: member.user
+    ? {
+        id: member.user.id,
+        email: member.user.email ?? '',
+        full_name: member.user.full_name ?? null,
+        avatar_url: member.user.avatar_url ?? null,
+        created_at: member.user.created_at ?? new Date().toISOString(),
+      }
+    : undefined,
+})
+
+const mapWorkspace = (workspace: any): Workspace => {
+  const { workspace_members, ...rest } = workspace
+
+  const members = Array.isArray(workspace_members)
+    ? workspace_members.map(mapWorkspaceMember)
+    : []
+
+  return {
+    ...rest,
+    description: rest.description ?? null,
+    icon: rest.icon ?? null,
+    color: rest.color ?? null,
+    parent_workspace_id: rest.parent_workspace_id ?? null,
+    archived_at: rest.archived_at ?? null,
+    settings: rest.settings ?? {},
+    is_archived: Boolean(rest.is_archived),
+    members,
+    member_count: rest.member_count ?? members.length,
+  }
+}
 
 export function useWorkspaces() {
   const queryClient = useQueryClient()
@@ -13,56 +64,77 @@ export function useWorkspaces() {
         .from('workspaces')
         .select(`
           *,
-          workspace_members!inner(user_id, role)
+          workspace_members:workspace_members(
+            workspace_id,
+            user_id,
+            role,
+            permissions,
+            invited_by,
+            last_active_at,
+            joined_at,
+            user:profiles(id, email, full_name, avatar_url, created_at)
+          )
         `)
         .order('created_at', { ascending: false })
 
       if (error) throw error
-      return data as Workspace[]
+      return (data ?? []).map(mapWorkspace) as Workspace[]
     },
   })
 
   const createWorkspace = useMutation({
-    mutationFn: async (workspace: { name: string; description?: string }) => {
-      const { data: { user } } = await supabase.auth.getUser()
+    mutationFn: async (workspace: { name: string; description?: string | null }) => {
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser()
+
+      if (authError) throw authError
       if (!user) throw new Error('Not authenticated')
 
-      // Create workspace
-      const { data: newWorkspace, error: workspaceError } = await supabase
-        .from('workspaces')
-        .insert({
-          name: workspace.name,
-          description: workspace.description,
-          owner_id: user.id,
-        })
-        .select()
-        .single()
+      const baseSlug = slugify(workspace.name)
 
-      if (workspaceError) throw workspaceError
+      const insertWorkspace = async (slug: string) =>
+        supabase
+          .from('workspaces')
+          .insert({
+            name: workspace.name,
+            description: workspace.description ?? null,
+            owner_id: user.id,
+            slug,
+          })
+          .select()
+          .single()
 
-      // Add creator as owner member
-      const { error: memberError } = await supabase
-        .from('workspace_members')
-        .insert({
-          workspace_id: newWorkspace.id,
-          user_id: user.id,
-          role: 'owner',
-        })
+      let attempt = 0
+      let slug = baseSlug
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        const { data: newWorkspace, error: workspaceError } = await insertWorkspace(slug)
 
-      if (memberError) throw memberError
+        if (!workspaceError) {
+          return mapWorkspace(newWorkspace)
+        }
 
-      return newWorkspace
+        if (workspaceError.code === '23505' && attempt < 3) {
+          attempt += 1
+          slug = `${baseSlug}-${Math.random().toString(36).slice(2, 6)}`
+          continue
+        }
+
+        throw workspaceError
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspaces'] })
       toast({
-        title: 'Success',
-        description: 'Workspace created successfully',
+        title: 'Đã tạo workspace',
+        description: 'Workspace mới đã sẵn sàng cho nhóm của bạn.',
       })
     },
     onError: (error: Error) => {
       toast({
-        title: 'Error',
+        title: 'Không thể tạo workspace',
         description: error.message,
         variant: 'destructive',
       })
@@ -70,7 +142,12 @@ export function useWorkspaces() {
   })
 
   const updateWorkspace = useMutation({
-    mutationFn: async ({ id, ...updates }: Partial<Workspace> & { id: string }) => {
+    mutationFn: async ({ id, slug, ...rest }: Partial<Workspace> & { id: string }) => {
+      const updates = {
+        ...rest,
+        slug: slug ? slugify(slug) : undefined,
+      }
+
       const { data, error } = await supabase
         .from('workspaces')
         .update(updates)
@@ -79,18 +156,18 @@ export function useWorkspaces() {
         .single()
 
       if (error) throw error
-      return data
+      return mapWorkspace(data)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspaces'] })
       toast({
-        title: 'Success',
-        description: 'Workspace updated successfully',
+        title: 'Đã cập nhật workspace',
+        description: 'Thông tin workspace đã được lưu lại.',
       })
     },
     onError: (error: Error) => {
       toast({
-        title: 'Error',
+        title: 'Không thể cập nhật workspace',
         description: error.message,
         variant: 'destructive',
       })
@@ -109,13 +186,13 @@ export function useWorkspaces() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspaces'] })
       toast({
-        title: 'Success',
-        description: 'Workspace deleted successfully',
+        title: 'Đã xoá workspace',
+        description: 'Workspace đã được chuyển vào thùng rác.',
       })
     },
     onError: (error: Error) => {
       toast({
-        title: 'Error',
+        title: 'Không thể xoá workspace',
         description: error.message,
         variant: 'destructive',
       })

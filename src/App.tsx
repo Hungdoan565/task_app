@@ -18,7 +18,11 @@ import Pricing from "./pages/Pricing";
 import AIDevelopment from "./pages/AIDevelopment";
 import Enterprise from "./pages/Enterprise";
 import Dashboard from "./pages/Dashboard";
+import Kanban from "./pages/Kanban";
 import NotFound from "./pages/NotFound";
+
+// Layout
+import AppLayout from "./components/layout/AppLayout";
 
 function ScrollToTop() {
     const { pathname } = useLocation();
@@ -53,49 +57,49 @@ const queryClient = new QueryClient({
 
 function App() {
   return (
-<<<<<<< HEAD
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
-        <Router>
-        <Routes>
-=======
     <ErrorBoundary>
       <HelmetProvider>
-        <Router>
-          <SkipLink />
-          <ScrollToTop />
-          <PageTracking />
-          <Routes>
->>>>>>> 34510a4c28b0244503a9f36970b9e198898768b9
-          {/* Public Routes */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/signin" element={<Auth />} />
-          <Route path="/signup" element={<Auth />} />
-          <Route path="/features" element={<Features />} />
-          <Route path="/downloads" element={<Downloads />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/ai-development" element={<AIDevelopment />} />
-          <Route path="/enterprise" element={<Enterprise />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
+        <QueryClientProvider client={queryClient}>
+          <Router>
+            <SkipLink />
+            <ScrollToTop />
+            <PageTracking />
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<Landing />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/signin" element={<Auth />} />
+              <Route path="/signup" element={<Auth />} />
+              <Route path="/features" element={<Features />} />
+              <Route path="/downloads" element={<Downloads />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/ai-development" element={<AIDevelopment />} />
+              <Route path="/enterprise" element={<Enterprise />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
 
-          {/* Protected Routes */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+              {/* Protected Routes with Layout */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="kanban" element={<Kanban />} />
+                <Route path="tasks" element={<Dashboard />} />
+                <Route path="calendar" element={<Dashboard />} />
+                <Route path="settings" element={<Dashboard />} />
+              </Route>
 
-          {/* 404 Not Found */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-        </Router>
-      </QueryClientProvider>
-    </HelmetProvider>
+              {/* 404 Not Found */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Router>
+        </QueryClientProvider>
+      </HelmetProvider>
     </ErrorBoundary>
   );
 }

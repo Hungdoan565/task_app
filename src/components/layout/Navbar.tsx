@@ -9,15 +9,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { useAuth } from '@/hooks/useAuth'
 import { useStore } from '@/store/useStore'
-import { useState } from 'react'
 import CreateWorkspaceDialog from '@/components/workspace/CreateWorkspaceDialog'
 
 export default function Navbar() {
   const { user, signOut } = useAuth()
-  const { sidebarOpen, setSidebarOpen } = useStore()
-  const [createWorkspaceOpen, setCreateWorkspaceOpen] = useState(false)
+  const {
+    sidebarOpen,
+    setSidebarOpen,
+    createWorkspaceOpen,
+    setCreateWorkspaceOpen,
+  } = useStore()
 
   const getInitials = (name?: string | null) => {
     if (!name) return '?'
@@ -31,7 +35,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="bg-white border-b fixed top-0 left-0 right-0 z-40">
+      <nav className="fixed top-0 left-0 right-0 z-40 border-b border-gray-200 bg-white/95 backdrop-blur dark:border-gray-800 dark:bg-gray-950/95">
         <div className="px-4 py-3 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <Button
@@ -44,7 +48,7 @@ export default function Navbar() {
             
             <div className="flex items-center space-x-2">
               <CheckCircle className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold text-gray-900 hidden sm:inline">
+              <span className="text-xl font-bold text-gray-900 dark:text-white hidden sm:inline">
                 TaskFlow
               </span>
             </div>
@@ -61,6 +65,8 @@ export default function Navbar() {
               <Bell className="h-5 w-5" />
               <span className="sr-only">Notifications</span>
             </Button>
+
+            <ThemeToggle />
 
             <Button
               variant="default"

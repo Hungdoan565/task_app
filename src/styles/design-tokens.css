@@ -1,0 +1,320 @@
+/* Design Tokens - TaskFlow Dual Dashboard */
+
+@layer base {
+  :root {
+    /* Colors - Light Theme */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 199 89% 48%;
+    --radius: 0.5rem;
+    
+    /* Success & Warning */
+    --success: 142 76% 36%;
+    --success-foreground: 210 40% 98%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+  }
+
+  .dark {
+    /* Colors - Dark Theme */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 199 89% 48%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 199 89% 48%;
+    
+    --success: 142 70% 45%;
+    --success-foreground: 144 61% 20%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 48 96% 89%;
+  }
+}
+
+/* Typography Scale */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Display Sizes */
+  .display-xl {
+    @apply text-6xl font-bold tracking-tight leading-tight;
+  }
+  
+  .display-lg {
+    @apply text-5xl font-bold tracking-tight leading-tight;
+  }
+  
+  .display-md {
+    @apply text-4xl font-bold tracking-tight leading-tight;
+  }
+  
+  /* Headings */
+  h1, .h1 {
+    @apply text-3xl font-bold tracking-tight;
+  }
+  
+  h2, .h2 {
+    @apply text-2xl font-semibold tracking-tight;
+  }
+  
+  h3, .h3 {
+    @apply text-xl font-semibold tracking-tight;
+  }
+  
+  h4, .h4 {
+    @apply text-lg font-semibold;
+  }
+  
+  h5, .h5 {
+    @apply text-base font-semibold;
+  }
+  
+  h6, .h6 {
+    @apply text-sm font-semibold;
+  }
+  
+  /* Body Text */
+  .body-xl {
+    @apply text-lg leading-relaxed;
+  }
+  
+  .body-lg {
+    @apply text-base leading-relaxed;
+  }
+  
+  .body-md {
+    @apply text-sm leading-normal;
+  }
+  
+  .body-sm {
+    @apply text-xs leading-normal;
+  }
+  
+  /* Special */
+  .label-text {
+    @apply text-xs font-semibold uppercase tracking-wider;
+  }
+  
+  .code-text {
+    @apply font-mono text-sm;
+  }
+  
+  .caption-text {
+    @apply text-xs text-muted-foreground;
+  }
+}
+
+/* Custom Animations */
+@layer utilities {
+  /* Fade Animations */
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+  
+  .animate-fade-out {
+    animation: fade-out 0.3s ease-out;
+  }
+  
+  /* Slide Animations */
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+  
+  .animate-slide-down {
+    animation: slide-down 0.3s ease-out;
+  }
+  
+  .animate-slide-left {
+    animation: slide-left 0.3s ease-out;
+  }
+  
+  .animate-slide-right {
+    animation: slide-right 0.3s ease-out;
+  }
+  
+  /* Scale Animations */
+  .animate-scale-in {
+    animation: scale-in 0.2s ease-out;
+  }
+  
+  .animate-scale-out {
+    animation: scale-out 0.2s ease-out;
+  }
+  
+  /* Pulse Animation */
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-down {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-left {
+  from {
+    transform: translateX(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-right {
+  from {
+    transform: translateX(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scale-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+/* Utility Classes */
+@layer utilities {
+  /* Scrollbar Styling */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted)) transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted));
+    border-radius: 4px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground));
+  }
+  
+  /* Glass Morphism */
+  .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .dark .glass {
+    background: rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent;
+  }
+  
+  /* Shadow Utilities */
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
+  }
+  
+  .shadow-glow-lg {
+    box-shadow: 0 0 40px rgba(14, 165, 233, 0.4);
+  }
+}

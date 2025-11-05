@@ -100,7 +100,7 @@ export default function FeaturesPage() {
         "Hiển thị trạng thái online",
       ],
       useCase: "Được xây dựng cho nhóm từ xa",
-      iconColor: "bg-purple-100 text-purple-600",
+      iconColor: "bg-indigo-100 text-indigo-600",
       screenshotVariant: "dashboard" as const,
     },
     {
@@ -115,7 +115,7 @@ export default function FeaturesPage() {
         "Thanh công cụ trực quan",
       ],
       useCase: "Ghi chú kỹ thuật chi tiết",
-      iconColor: "bg-amber-100 text-amber-600",
+      iconColor: "bg-blue-100 text-blue-600",
     },
     {
       icon: Paperclip,
@@ -129,7 +129,7 @@ export default function FeaturesPage() {
         "Lưu trữ cloud an toàn",
       ],
       useCase: "Tập trung tài liệu dự án",
-      iconColor: "bg-green-100 text-green-600",
+      iconColor: "bg-indigo-100 text-indigo-600",
     },
     {
       icon: Search,
