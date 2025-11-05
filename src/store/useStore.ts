@@ -22,6 +22,12 @@ interface AppState {
   setTaskDialogOpen: (open: boolean) => void
   inviteDialogOpen: boolean
   setInviteDialogOpen: (open: boolean) => void
+  workspaceEditor: {
+    open: boolean
+    workspace: Workspace | null
+  }
+  openWorkspaceEditor: (workspace: Workspace | null) => void
+  closeWorkspaceEditor: () => void
   folderDialogTrigger: FolderDialogTrigger | null
   setFolderDialogTrigger: (trigger: FolderDialogTrigger | null) => void
 }
@@ -43,6 +49,24 @@ export const useStore = create<AppState>((set) => ({
   setTaskDialogOpen: (open) => set({ taskDialogOpen: open }),
   inviteDialogOpen: false,
   setInviteDialogOpen: (open) => set({ inviteDialogOpen: open }),
+  workspaceEditor: {
+    open: false,
+    workspace: null,
+  },
+  openWorkspaceEditor: (workspace) =>
+    set({
+      workspaceEditor: {
+        open: true,
+        workspace: workspace ?? null,
+      },
+    }),
+  closeWorkspaceEditor: () =>
+    set({
+      workspaceEditor: {
+        open: false,
+        workspace: null,
+      },
+    }),
   folderDialogTrigger: null,
   setFolderDialogTrigger: (trigger) => set({ folderDialogTrigger: trigger }),
 }))

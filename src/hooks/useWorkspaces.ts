@@ -72,7 +72,7 @@ export function useWorkspaces() {
             invited_by,
             last_active_at,
             joined_at,
-            user:profiles(id, email, full_name, avatar_url, created_at)
+            user:profiles!workspace_members_user_id_fkey(id, email, full_name, avatar_url, created_at)
           )
         `)
         .order('created_at', { ascending: false })
@@ -158,19 +158,49 @@ export function useWorkspaces() {
       if (error) throw error
       return mapWorkspace(data)
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workspaces'] })
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({ queryKey: ['workspaces'] })
+      const previous = queryClient.getQueryData<Workspace[]>(['workspaces'])
+
+      if (previous) {
+        queryClient.setQueryData<Workspace[]>(['workspaces'], (current = []) =>
+          current.map((workspace) =>
+            workspace.id === variables.id
+              ? {
+                  ...workspace,
+                  ...variables,
+                  slug: variables.slug ? slugify(variables.slug) : workspace.slug,
+                }
+              : workspace,
+          ),
+        )
+      }
+
+      return { previous }
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData<Workspace[]>(['workspaces'], (current = []) =>
+        current.map((workspace) => (workspace.id === data.id ? { ...workspace, ...data } : workspace)),
+      )
+
       toast({
         title: 'Đã cập nhật workspace',
         description: 'Thông tin workspace đã được lưu lại.',
       })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _variables, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['workspaces'], context.previous)
+      }
+
       toast({
         title: 'Không thể cập nhật workspace',
         description: error.message,
         variant: 'destructive',
       })
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspaces'] })
     },
   })
 
@@ -183,19 +213,38 @@ export function useWorkspaces() {
 
       if (error) throw error
     },
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['workspaces'] })
+      const previous = queryClient.getQueryData<Workspace[]>(['workspaces'])
+
+      if (previous) {
+        queryClient.setQueryData<Workspace[]>(
+          ['workspaces'],
+          previous.filter((workspace) => workspace.id !== id),
+        )
+      }
+
+      return { previous }
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['workspaces'] })
       toast({
         title: 'Đã xoá workspace',
         description: 'Workspace đã được chuyển vào thùng rác.',
       })
     },
-    onError: (error: Error) => {
+    onError: (error: Error, _variables, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['workspaces'], context.previous)
+      }
+
       toast({
         title: 'Không thể xoá workspace',
         description: error.message,
         variant: 'destructive',
       })
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ['workspaces'] })
     },
   })
 

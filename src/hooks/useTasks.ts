@@ -80,7 +80,7 @@ export function useTasks({ workspaceId, folderId, includeArchived = false }: Use
             folder:workspace_folders!tasks_folder_id_fkey(id, name, slug, parent_id, depth, position, path, icon, color),
             assignee:profiles!tasks_assigned_to_fkey(id, full_name, avatar_url),
             creator:profiles!tasks_created_by_fkey(id, full_name, avatar_url),
-            parent_task:tasks!tasks_parent_task_id_fkey(id, title, status, priority),
+            parent_task:tasks(id, title, status, priority),
             status_info:workspace_statuses!tasks_status_id_fkey(id, key, name, color, position)
           `
         )

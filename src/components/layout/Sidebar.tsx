@@ -16,6 +16,10 @@ import { useStore } from '@/store/useStore'
 import { useWorkspaces } from '@/hooks/useWorkspaces'
 import { cn } from '@/lib/utils'
 import FolderTree from '@/components/workspace/FolderTree'
+import WorkspaceListItem from '@/components/workspace/WorkspaceListItem'
+import WorkspaceEditorDialog from '@/components/workspace/WorkspaceEditorDialog'
+import { useConfirmDialog } from '@/components/providers/ConfirmDialogProvider'
+import { useAuth } from '@/hooks/useAuth'
 import { Workspace } from '@/types'
 
 export default function Sidebar() {
@@ -27,9 +31,12 @@ export default function Sidebar() {
     setTaskDialogOpen,
     setInviteDialogOpen,
     setCreateWorkspaceOpen,
+    openWorkspaceEditor,
     setFolderDialogTrigger,
   } = useStore()
-  const { workspaces } = useWorkspaces()
+  const { user } = useAuth()
+  const { confirm } = useConfirmDialog()
+  const { workspaces, deleteWorkspace } = useWorkspaces()
 
   const navigation = [
     { name: 'Tổng quan', href: '/dashboard', icon: LayoutDashboard },
@@ -74,6 +81,51 @@ export default function Sidebar() {
     }
     setInviteDialogOpen(true)
   }, [currentWorkspace, setCreateWorkspaceOpen, setInviteDialogOpen])
+
+  const handleRenameWorkspace = useCallback(
+    (workspace: Workspace) => {
+      openWorkspaceEditor(workspace)
+    },
+    [openWorkspaceEditor],
+  )
+
+  const handleInviteWorkspaceMembers = useCallback(
+    (workspace: Workspace) => {
+      setCurrentWorkspace(workspace)
+      setInviteDialogOpen(true)
+    },
+    [setCurrentWorkspace, setInviteDialogOpen],
+  )
+
+  const handleDeleteWorkspace = useCallback(
+    async (workspace: Workspace) => {
+      const confirmed = await confirm({
+        title: `Xoá workspace “${workspace.name}”?`,
+        description: 'Toàn bộ công việc, thư mục và hoạt động liên quan sẽ bị xoá vĩnh viễn.',
+        confirmText: 'Xoá workspace',
+        confirmVariant: 'destructive',
+      })
+
+      if (!confirmed) return
+
+      try {
+        await deleteWorkspace.mutateAsync(workspace.id)
+
+        if (currentWorkspace?.id === workspace.id) {
+          const remaining = workspaces?.filter((entry) => entry.id !== workspace.id) ?? []
+          if (remaining.length > 0) {
+            setCurrentWorkspace(remaining[0])
+          } else {
+            setCurrentWorkspace(null)
+            setCreateWorkspaceOpen(true)
+          }
+        }
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    [confirm, deleteWorkspace, currentWorkspace?.id, workspaces, setCurrentWorkspace, setCreateWorkspaceOpen],
+  )
 
   if (!sidebarOpen) return null
 
@@ -154,6 +206,39 @@ export default function Sidebar() {
               </div>
             )}
           </div>
+
+          {workspaces && workspaces.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                <span>Workspaces của bạn</span>
+                <span>{workspaces.length}</span>
+              </div>
+              <div className="space-y-1" role="list" aria-label="Danh sách workspace">
+                {workspaces.map((workspace) => {
+                  const membership = workspace.members?.find((member) => member.user_id === user?.id)
+                  const role = membership?.role ?? (workspace.owner_id === user?.id ? 'owner' : undefined)
+                  const canManageMembers = role === 'owner' || role === 'admin'
+                  const canManageWorkspace = role === 'owner' || role === 'admin'
+
+                  return (
+                    <WorkspaceListItem
+                      key={workspace.id}
+                      workspace={workspace}
+                      isActive={currentWorkspace?.id === workspace.id}
+                      canRename={canManageWorkspace}
+                      canInvite={canManageMembers}
+                      canDelete={workspace.owner_id === user?.id}
+                      isDeleting={deleteWorkspace.isPending}
+                      onOpen={handleWorkspaceChange}
+                      onRename={handleRenameWorkspace}
+                      onInvite={handleInviteWorkspaceMembers}
+                      onDelete={handleDeleteWorkspace}
+                    />
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           {currentWorkspace && (
             <>
@@ -245,6 +330,7 @@ export default function Sidebar() {
           </div>
         )}
       </div>
+      <WorkspaceEditorDialog />
     </aside>
   )
 }

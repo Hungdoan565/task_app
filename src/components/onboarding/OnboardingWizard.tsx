@@ -12,7 +12,21 @@ import {
   ArrowRight,
   ArrowLeft,
   X,
+  Code2,
+  Palette,
+  BarChart3,
+  Megaphone,
+  Wallet,
+  Sparkles,
+  UserRound,
+  CalendarClock,
+  Zap,
+  Folders,
+  UserCircle,
+  KanbanSquare,
+  Building2,
 } from "lucide-react";
+import BrandIcon from "@/components/ui/brand-icon";
 
 interface OnboardingWizardProps {
   open: boolean;
@@ -37,12 +51,12 @@ const createInitialData = (): OnboardingData => ({
 });
 
 const roles = [
-  { value: "developer", label: "Developer / Engineer", icon: "💻" },
-  { value: "designer", label: "Designer", icon: "🎨" },
-  { value: "pm", label: "Product Manager", icon: "📊" },
-  { value: "marketing", label: "Marketing", icon: "📱" },
-  { value: "sales", label: "Sales", icon: "💼" },
-  { value: "other", label: "Khác", icon: "✨" },
+  { value: "developer", label: "Developer / Engineer", icon: Code2, variant: "indigo" },
+  { value: "designer", label: "Designer", icon: Palette, variant: "purple" },
+  { value: "pm", label: "Product Manager", icon: BarChart3, variant: "blue" },
+  { value: "marketing", label: "Marketing", icon: Megaphone, variant: "pink" },
+  { value: "sales", label: "Sales", icon: Wallet, variant: "orange" },
+  { value: "other", label: "Khác", icon: Sparkles, variant: "slate" },
 ];
 
 const teamSizes = [
@@ -53,18 +67,18 @@ const teamSizes = [
 ];
 
 const useCases = [
-  { value: "personal", label: "Quản lý công việc cá nhân", icon: "👤" },
-  { value: "team", label: "Cộng tác team", icon: "👥" },
-  { value: "projects", label: "Quản lý dự án", icon: "📋" },
-  { value: "client", label: "Quản lý khách hàng", icon: "🤝" },
+  { value: "personal", label: "Quản lý công việc cá nhân", icon: UserCircle, variant: "indigo" },
+  { value: "team", label: "Cộng tác team", icon: Users, variant: "purple" },
+  { value: "projects", label: "Quản lý dự án", icon: KanbanSquare, variant: "blue" },
+  { value: "client", label: "Quản lý khách hàng", icon: Building2, variant: "green" },
 ];
 
 const goals = [
-  { value: "productivity", label: "Tăng năng suất", icon: "⚡" },
-  { value: "organization", label: "Tổ chức công việc tốt hơn", icon: "📁" },
-  { value: "collaboration", label: "Cải thiện cộng tác", icon: "🤝" },
-  { value: "deadlines", label: "Theo dõi deadline", icon: "📅" },
-  { value: "reporting", label: "Báo cáo & phân tích", icon: "📊" },
+  { value: "productivity", label: "Tăng năng suất", icon: Zap, variant: "orange" },
+  { value: "organization", label: "Tổ chức công việc tốt hơn", icon: Folders, variant: "indigo" },
+  { value: "collaboration", label: "Cải thiện cộng tác", icon: UserRound, variant: "purple" },
+  { value: "deadlines", label: "Theo dõi deadline", icon: CalendarClock, variant: "blue" },
+  { value: "reporting", label: "Báo cáo & phân tích", icon: BarChart3, variant: "green" },
 ];
 
 export default function OnboardingWizard({
@@ -247,8 +261,10 @@ export default function OnboardingWizard({
                               ? "border-indigo-600 bg-indigo-50"
                               : "border-slate-200 hover:border-indigo-300"
                           }`}
+                          type="button"
+                          aria-pressed={data.role === role.value}
                         >
-                          <div className="text-2xl mb-1">{role.icon}</div>
+                          <BrandIcon icon={role.icon} variant={role.variant} size="sm" className="mb-2" />
                           <div className="text-sm font-medium text-slate-900">
                             {role.label}
                           </div>
@@ -319,8 +335,10 @@ export default function OnboardingWizard({
                           ? "border-indigo-600 bg-indigo-50"
                           : "border-slate-200 hover:border-indigo-300"
                       }`}
+                      type="button"
+                      aria-pressed={data.useCase === useCase.value}
                     >
-                      <div className="text-4xl mb-3">{useCase.icon}</div>
+                      <BrandIcon icon={useCase.icon} variant={useCase.variant} size="md" className="mb-3" />
                       <div className="text-sm font-medium text-slate-900">
                         {useCase.label}
                       </div>
@@ -362,8 +380,10 @@ export default function OnboardingWizard({
                           ? "border-indigo-600 bg-indigo-50"
                           : "border-slate-200 hover:border-indigo-300"
                       }`}
+                      type="button"
+                      aria-pressed={data.goals.includes(goal.value)}
                     >
-                      <div className="text-2xl">{goal.icon}</div>
+                      <BrandIcon icon={goal.icon} variant={goal.variant} size="sm" />
                       <div className="flex-1 text-left">
                         <div className="text-sm font-medium text-slate-900">
                           {goal.label}

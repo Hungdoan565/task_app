@@ -22,6 +22,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu'
+import { useConfirmDialog } from '@/components/providers/ConfirmDialogProvider'
 import { cn } from '@/lib/utils'
 import { useStore } from '@/store/useStore'
 import { useFolders } from '@/hooks/useFolders'
@@ -44,6 +45,7 @@ interface FolderTreeProps {
 }
 
 export default function FolderTree({ workspaceId }: FolderTreeProps) {
+  const { confirm } = useConfirmDialog()
   const {
     currentFolder,
     setCurrentFolder,
@@ -113,9 +115,14 @@ export default function FolderTree({ workspaceId }: FolderTreeProps) {
   }
 
   const handleDelete = async (folder: WorkspaceFolder) => {
-    const confirmed = window.confirm(
-      `Xoá thư mục “${folder.name}”? Tất cả thư mục con và công việc bên trong sẽ bị xoá hoặc được đưa về trạng thái chưa phân loại.`
-    )
+    const confirmed = await confirm({
+      title: `Xoá thư mục “${folder.name}”?`,
+      description:
+        'Tất cả thư mục con và công việc bên trong sẽ bị xoá hoặc được đưa về trạng thái chưa phân loại.',
+      confirmText: 'Xoá thư mục',
+      cancelText: 'Giữ lại',
+      confirmVariant: 'destructive',
+    })
 
     if (!confirmed) return
 
@@ -144,6 +151,10 @@ export default function FolderTree({ workspaceId }: FolderTreeProps) {
   useEffect(() => {
     setCollapsedIds((prev) => {
       const next = new Set(Array.from(prev).filter((id) => flattenedIds.includes(id)))
+      // Only update if the set actually changed to prevent infinite loop
+      if (next.size === prev.size && Array.from(next).every((id) => prev.has(id))) {
+        return prev
+      }
       return next
     })
   }, [flattenedIds])

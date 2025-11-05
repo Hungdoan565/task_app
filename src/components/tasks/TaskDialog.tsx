@@ -53,6 +53,7 @@ import { cn } from "@/lib/utils";
 import type { Task, TaskPriority, WorkspaceFolder, WorkspaceMember, WorkspaceStatus } from "@/types";
 import { RADIUS, SHADOW } from "@/constants/design";
 import { toast } from "@/hooks/use-toast";
+import { useConfirmDialog } from "@/components/providers/ConfirmDialogProvider";
 
 const PRIORITY_OPTIONS = ["low", "medium", "high", "urgent"] as const;
 
@@ -145,6 +146,7 @@ export default function TaskDialog({
   onSuccess,
   workspaceMembersOverride,
 }: TaskDialogProps) {
+  const { confirm } = useConfirmDialog();
   const { statuses, isLoading: isLoadingStatuses } = useWorkspaceStatuses(workspaceId);
   const { folderTree, isLoading: isLoadingFolders } = useFolders({ workspaceId });
   const { createTask } = useTasks({ workspaceId });
@@ -175,6 +177,17 @@ export default function TaskDialog({
   const initialDescriptionContent = useMemo(() => {
     return parseDescriptionInput(defaultValues?.description) ?? EMPTY_DOC;
   }, [defaultValues?.description]);
+
+  const handleLinkUnavailable = useCallback(() => {
+    void confirm({
+      title: "Tính năng chèn liên kết sắp ra mắt",
+      description:
+        "Chúng tôi đang hoàn thiện trải nghiệm chèn liên kết. Trong lúc này, bạn có thể dán URL trực tiếp vào phần mô tả hoặc đính kèm tài liệu liên quan.",
+      confirmText: "Đã hiểu",
+      confirmVariant: "secondary",
+      hideCancel: true,
+    });
+  }, [confirm]);
 
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskFormSchema) as any,
@@ -432,7 +445,7 @@ export default function TaskDialog({
                     Mô tả
                   </FormLabel>
                   <div className="rounded-2xl border border-dashed border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
-                    <RichTextToolbar editor={editor} disabled={isSaving} />
+                    <RichTextToolbar editor={editor} disabled={isSaving} onLinkRequest={handleLinkUnavailable} />
                     <div className="max-h-[280px] overflow-y-auto px-4 pb-4">
                       <EditorContent editor={editor} />
                     </div>
@@ -749,9 +762,10 @@ export default function TaskDialog({
 interface RichTextToolbarProps {
   editor: ReturnType<typeof useEditor>;
   disabled?: boolean;
+  onLinkRequest: () => void;
 }
 
-function RichTextToolbar({ editor, disabled }: RichTextToolbarProps) {
+function RichTextToolbar({ editor, disabled, onLinkRequest }: RichTextToolbarProps) {
   if (!editor) return null;
 
   const ToolbarButton = ({
@@ -808,12 +822,7 @@ function RichTextToolbar({ editor, disabled }: RichTextToolbarProps) {
         icon={Link}
         label="Link"
         active={editor.isActive("link")}
-        onClick={() => {
-          const url = window.prompt("Nhập URL");
-          if (!url) return;
-          // Link extension removed - basic text only
-          editor.chain().focus().run();
-        }}
+        onClick={onLinkRequest}
       />
       <ToolbarButton
         icon={RemoveFormatting}

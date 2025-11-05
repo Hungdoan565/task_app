@@ -2,6 +2,7 @@ import { useLayoutEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ConfirmDialogProvider } from "@/components/providers/ConfirmDialogProvider";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { usePageTracking } from "./hooks/usePageTracking";
@@ -60,6 +61,7 @@ function App() {
     <ErrorBoundary>
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
+          <ConfirmDialogProvider>
           <Router>
             <SkipLink />
             <ScrollToTop />
@@ -98,6 +100,7 @@ function App() {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Router>
+          </ConfirmDialogProvider>
         </QueryClientProvider>
       </HelmetProvider>
     </ErrorBoundary>
