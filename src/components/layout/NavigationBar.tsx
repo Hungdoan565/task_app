@@ -8,14 +8,25 @@ import {
   ChevronDown,
   CreditCard,
   Download,
+  LogOut,
   Menu,
   Sparkles,
+  User2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/hooks/useAuth";
 
 type DropdownItem = {
@@ -31,8 +42,19 @@ type NavItem = {
   dropdown?: DropdownItem[];
 };
 
+const getInitials = (name?: string | null) => {
+  if (!name) return "??";
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+};
+
 export default function NavigationBar() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -231,31 +253,65 @@ export default function NavigationBar() {
 
         <div className="hidden items-center space-x-3 md:flex">
           {user ? (
-            <Link to="/dashboard">
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button className="font-semibold shadow-lg transition-all duration-300 hover:shadow-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 hover:from-indigo-700 hover:via-blue-700 hover:to-indigo-700">
-                  Bảng Điều Khiển
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-3 rounded-full border-slate-100 bg-white px-3.5 py-1.5 shadow-sm transition-all duration-200 hover:border-indigo-200 hover:shadow-md"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name || user.email || undefined} />
+                    <AvatarFallback>{getInitials(user.user_metadata?.full_name || user.email)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm font-semibold text-slate-900 leading-none">
+                      {user.user_metadata?.full_name || "Tài khoản"}
+                    </span>
+                    <span className="text-[11px] text-slate-400 tracking-wide">Tùy chọn</span>
+                  </div>
                 </Button>
-              </motion.div>
-            </Link>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" sideOffset={12} className="w-64 rounded-2xl border border-slate-100 bg-white/98 p-1 shadow-xl backdrop-blur">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1.5">
+                    <span className="text-sm font-semibold text-slate-900 leading-tight">
+                      {user.user_metadata?.full_name || "Người dùng TaskFlow"}
+                    </span>
+                    <span className="text-xs text-slate-500">{user.email}</span>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="mx-1" />
+                <DropdownMenuItem asChild className="rounded-xl text-slate-700 focus:bg-indigo-50 focus:text-indigo-700">
+                  <Link to="/dashboard" className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-indigo-500" />
+                    <span className="text-sm">Đi tới bảng điều khiển</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="rounded-xl text-slate-700 focus:bg-indigo-50 focus:text-indigo-700">
+                  <Link to="/settings?tab=profile" className="flex items-center gap-2">
+                    <User2 className="h-4 w-4 text-slate-400" />
+                    <span className="text-sm">Tài khoản của tôi</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="mx-1" />
+                <DropdownMenuItem
+                  className="rounded-xl text-red-600 focus:bg-red-50 focus:text-red-600"
+                  onClick={() => signOut()}
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span className="text-sm">Đăng xuất</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <>
-              <Link to="/signin">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button
-                    variant="outline"
-                    className="relative border-2 border-slate-300 bg-white font-semibold shadow-sm transition-all duration-300 hover:border-indigo-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-blue-50 hover:shadow-md"
-                  >
-                    <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
-                      Đăng Nhập
-                    </span>
-                  </Button>
-                </motion.div>
+              <Link to="/signin" className="text-sm font-medium text-slate-600 transition-colors duration-200 hover:text-indigo-600">
+                Đăng nhập
               </Link>
               <Link to="/signup">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button className="font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 hover:from-indigo-700 hover:via-blue-700 hover:to-indigo-700">
-                    Đăng Ký
+                    Bắt đầu miễn phí
                   </Button>
                 </motion.div>
               </Link>
@@ -335,26 +391,57 @@ export default function NavigationBar() {
               <Separator />
 
               {user ? (
-                <Link to="/dashboard" onClick={() => setOpen(false)}>
-                  <Button className="w-full font-semibold shadow-lg transition-all duration-300 hover:shadow-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 hover:from-indigo-700 hover:via-blue-700 hover:to-indigo-700">
-                    Bảng Điều Khiển
-                  </Button>
-                </Link>
+                <div className="space-y-4">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5">
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-11 w-11">
+                        <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name || user.email || undefined} />
+                        <AvatarFallback>{getInitials(user.user_metadata?.full_name || user.email)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm font-semibold text-slate-900 leading-tight">
+                          {user.user_metadata?.full_name || "Người dùng TaskFlow"}
+                        </p>
+                        <p className="text-xs text-slate-500">{user.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <Link to="/dashboard" onClick={() => setOpen(false)}>
+                      <Button className="w-full justify-between rounded-xl border border-transparent bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:shadow-lg hover:from-indigo-700 hover:via-blue-700 hover:to-indigo-700">
+                        Đi tới bảng điều khiển
+                        <CheckCircle className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                    <Link to="/settings?tab=profile" onClick={() => setOpen(false)}>
+                      <Button variant="outline" className="w-full justify-between rounded-xl border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition-all duration-200 hover:border-indigo-300 hover:text-indigo-600">
+                        Quản lý tài khoản
+                        <User2 className="h-4 w-4" />
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start gap-2 rounded-xl px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50"
+                      onClick={() => {
+                        setOpen(false);
+                        signOut();
+                      }}
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Đăng xuất
+                    </Button>
+                  </div>
+                </div>
               ) : (
                 <div className="flex flex-col space-y-3">
                   <Link to="/signin" onClick={() => setOpen(false)}>
-                    <Button
-                      variant="outline"
-                      className="w-full border-2 border-slate-300 bg-white font-semibold shadow-sm transition-all duration-300 hover:border-indigo-300 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-blue-50 hover:shadow-md"
-                    >
-                      <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
-                        Đăng Nhập
-                      </span>
+                    <Button variant="outline" className="w-full border-slate-300 text-slate-700 hover:border-indigo-300 hover:text-indigo-600">
+                      Đăng nhập
                     </Button>
                   </Link>
                   <Link to="/signup" onClick={() => setOpen(false)}>
                     <Button className="w-full font-semibold text-white shadow-lg transition-all duration-300 hover:shadow-xl bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-600 hover:from-indigo-700 hover:via-blue-700 hover:to-indigo-700">
-                      Đăng Ký
+                      Bắt đầu miễn phí
                     </Button>
                   </Link>
                 </div>
